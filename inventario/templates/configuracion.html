@@ -1,0 +1,21 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container form-control">
+    <h4>Configuraciones</h4>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="iva" class="form-label">Porcentaje de IVA</label>
+            {{ form.iva }}
+        </div>
+        <div class="mb-3">
+            <label for="porcentaje_credito" class="form-label">Porcentaje adicional para Crédito</label>
+            {{ form.porcentaje_credito }}
+        </div>
+        <button class="btn btn-success" type="submit"><i class="fa fa-floppy-o" aria-hidden="true"></i> Guardar</button>
+    </form>
+</div>
+
+{% endblock %}

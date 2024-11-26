@@ -1,0 +1,33 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="linea-con-texto"><h5>REGISTRAR CLIENTE</h5></div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Ingrese Cedula/RUC:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.cliente_ruc }}</span>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Ingrese Razón Social:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.cliente_razonsocial }}</span>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Ingrese Dirección:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.cliente_direccion }}</span>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Ingrese N° Contacto:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.telefono }}</span>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Ingrese Correo Electronico:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.correo }}</span>
+        </div>
+
+        <button type="submit" class="btn btn-success"><i class="fa fa-floppy-o" aria-hidden="true"></i> Registrar</button>
+
+    </form>
+
+
+{% endblock %}

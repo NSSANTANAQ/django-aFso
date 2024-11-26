@@ -1,0 +1,76 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="linea-con-texto"><h5>CREAR MOVIMIENTO</h5></div>
+    <form method="post">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">Tipo de Proceso:</span>
+                <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.mov_producto_tipo }}</span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">Ingrese Fecha de Ingreso:</span>
+                <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.mov_producto_fechaingreso }}</span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">Ingrese Producto:</span>
+                <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.mov_producto_nom }}</span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">Ingrese Presentacion:</span>
+                <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.mov_producto_presentacion }}</span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">Ingrese Cantidad:</span>
+                <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.mov_producto_cantidad }}</span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">Precio Actual: $</span>
+                <input type="text" id="mov_producto_precio" class="input-group-text" readonly>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">Nuevo precio: $</span>
+                <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.mov_producto_precio }}</span><span id="passwordHelpInline" class="form-text">Si el precio no cambia, Ingrese el precio actual.</span>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="input-group mb-8">
+                <span class="input-group-text" id="basic-addon3">Observación:</span>
+                {{ form.mov_producto_observacion }}
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success"><i class="fa fa-floppy-o" aria-hidden="true"></i> Registrar</button>
+</form>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#id_mov_producto_nom, #id_mov_producto_presentacion').change(function(){
+            var producto_id = $('#id_mov_producto_nom').val();
+            var presentacion_id = $('#id_mov_producto_presentacion').val();
+
+            if(producto_id && presentacion_id){
+                $.ajax({
+                    url: "{% url 'obtener_precio_producto_presentacion' %}",
+                    data: {
+                        'producto_id': producto_id,
+                        'presentacion_id': presentacion_id
+                    },
+                    success: function(response){
+                        if(response.precio){
+                            $('#mov_producto_precio').val(response.precio);
+                        } else {
+                            alert('No se encontró el precio');
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock %}

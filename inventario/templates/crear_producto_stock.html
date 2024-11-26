@@ -1,0 +1,158 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="linea-con-texto"><h5>CREAR PRODUCTO</h5></div>
+<form method="post">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon3">Ingrese Producto:</span>
+        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.producto_nom }}</span>
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon3">Ingrese Presentacion:</span>
+        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.producto_presentacion }}</span>
+
+        <a type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pedidoModal">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+        </a>
+
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon3">Ingrese Fecha de Ingreso:</span>
+        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.producto_fechaingreso }}</span>
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon3">Ingrese Stock Incial:</span>
+        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.producto_stock }}</span>
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon3">Ingrese Precio:</span>
+        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.producto_precio }}</span>
+    </div>
+
+    <button type="submit" class="btn btn-success"><i class="fa fa-floppy-o" aria-hidden="true"></i> Registrar</button>
+</form>
+
+<div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pedidoModalLabel">Seleccionar Productos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'crear_presentacion' %}">
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">Ingrese Presentacion:</span>
+                        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ preform.presentacion_detalle }}</span>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i> Registrar
+                    </button>
+                </form>
+                <br>
+                <!-- Contenido del modal, como la tabla con los pedidos -->
+                <div class="table-responsive">
+                    <form id="modificar-form" method="post" action="{% url 'modificar_presentacion' %}">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered border-secondary">
+                            <thead class="table table-dark table-striped table-bordered border-secondary table-hover">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Presentación</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for presentacion in resultados_pre %}
+                                <tr>
+                                    <td>{{ presentacion.presentacion_id }}</td>
+                                    <td>
+                                        <input type="text" name="presentacion_{{ presentacion.presentacion_id }}" value="{{ presentacion.presentacion_detalle }}">
+                                        <input type="hidden" name="presentacion_id_{{ presentacion.presentacion_id }}" value="{{ presentacion.presentacion_id }}">
+                                    </td>
+                                    <td>
+                                        <button type="submit" name="save_{{ presentacion.presentacion_id }}" class="btn btn-success btn-sm">Guardar</button>
+                                        <button type="submit" name="delete_{{ presentacion.presentacion_id }}" class="btn btn-danger btn-sm"><img width="16" height="16" src="{% static 'img/trash-fill.svg' %}"></button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No se encontraron resultados.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('#modificar-form');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Evitar el envío normal del formulario
+
+        const formData = new FormData(form);
+
+        fetch("{% url 'modificar_presentacion' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Actualiza la tabla dentro del modal
+                actualizarTabla(data.actualizaciones);
+
+                // Muestra un mensaje de éxito
+                alert(data.message);
+            } else {
+                // Muestra un mensaje de error
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Hubo un error al procesar la solicitud.');
+        });
+    });
+});
+
+function actualizarTabla(actualizaciones) {
+    actualizaciones.forEach(actualizacion => {
+        const row = document.querySelector(`#row-${actualizacion.presentacion_id}`);
+        row.querySelector('.presentacion_detalle').textContent = actualizacion.presentacion_detalle;
+    });
+}
+</script>
+<style>
+/* Estilo para la tabla que permitirá el scroll vertical */
+.table-responsive {
+  max-height: 208px; /* Establece la altura máxima de la tabla */
+  overflow-y: auto;
+}
+
+/* Fija los encabezados de la tabla */
+.table thead th {
+  position: sticky;
+  top: -1px;
+  z-index: auto;
+}
+
+</style>
+{% endblock %}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="shortcut icon" type="img/png" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %} ">
+    <title>Generando Factura</title>
+    <style>
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <h4>Generando Factura ...</h4>
+
+        <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+  <span class="visually-hidden">Loading...</span>
+</div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const facturaId = "{{ factura_id }}";
+            setTimeout(function() {
+                window.location.href = '/inventario/imprimir_factura/' + facturaId + '/';
+            }, 1000); // Ajusta el tiempo de espera si es necesario
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="linea-con-texto"><h5>LISTADOS</h5></div>
+<table class="table">
+    <form method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Razón Social</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.cliente }}</span>
+            <button type="submit" class="btn btn-success"><i class="fa fa-search" aria-hidden="true"></i> Buscar
+            </button>
+        </div>
+    </form>
+    <a type="submit" class="btn btn-success" href={% url 'crear_listado_cliente' %}><i class="fa fa-plus"
+                                                                                       aria-hidden="true"></i> Nuevo</a>
+</table>
+
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered border-secondary">
+        <thead class="table table-dark table-striped table-bordered border-secondary table-hover">
+        <th>N°</th>
+        <th>RUC</th>
+        <th>Razón Social</th>
+        <th>Total Cuenta</th>
+        <th>Por Pagar</th>
+        <th>Pagado</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+
+        </thead>
+
+        <tbody>
+
+        {% for funcionarios in resultados %}
+        <tr>
+            <td> {{ forloop.counter }}</td>
+            <td> {{ funcionarios.cliente.cliente_ruc }}</td>
+            <td> {{ funcionarios.cliente.cliente_razonsocial }}</td>
+            <td>$ {{ funcionarios.total}}</td>
+            <td>$ {{ funcionarios.pendiente }}</td>
+            <td>$ {{ funcionarios.pagado }}</td>
+            {% if funcionarios.estado == 'AB' %}
+            <td style="text-align: center;background-color: darkorange; color: #FFFFFF;"><i
+                    class="fa fa-exclamation-triangle" aria-hidden="true"> Pendente </i></td>
+            {% elif funcionarios.estado == 'PG' %}
+            <td style="text-align: center;background-color: green; color: #FFFFFF;"><i class="fa fa-check"
+                                                                                       aria-hidden="true"> Pagado </i>
+            </td>
+            {% endif %}
+            <td style="text-align: center">
+                {% if funcionarios.estado == 'PG' %}
+                <a target="_blank" style="padding: 5px" class="btn btn-secondary" data-bs-toggle="tooltip"
+                   data-bs-placement="top" data-bs-title="Imprimir"
+                   href="{% url 'gestionar_listado_imprimir_pdf' funcionarios.id %}"
+                   onclick="return confirm('¿Estás seguro desea Imprimir este Listado?');">
+                    <img width="20" height="20" src="{% static 'img/printer-fill.svg' %}">
+                </a>
+                <a href="{% url 'gestionar_listado_detalle' funcionarios.pk %}" type="submit" class="btn btn-primary"
+                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver" style=" padding: 1px"><img
+                        style=" padding: 1px" width="30" height="30" src="{% static 'img/eye.svg' %}"></a>
+
+
+                {% elif funcionarios.estado == 'AB' %}
+                <a target="_blank" style="padding: 5px" class="btn btn-secondary" data-bs-toggle="tooltip"
+                   data-bs-placement="top" data-bs-title="Imprimir"
+                   href="{% url 'gestionar_listado_imprimir_pdf' funcionarios.id %}"
+                   onclick="return confirm('¿Estás seguro desea Imprimir este Listado?');">
+                    <img width="20" height="20" src="{% static 'img/printer-fill.svg' %}">
+                </a>
+                <a href="{% url 'gestionar_listado_detalle' funcionarios.pk %}" type="submit" class="btn btn-primary"
+                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver" style=" padding: 1px"><img
+                        style=" padding: 1px" width="30" height="30" src="{% static 'img/eye.svg' %}"></a>
+
+                <a style="padding: 5px" class="btn btn-danger text-dark" data-bs-toggle="tooltip"
+                   data-bs-placement="top" data-bs-title="Eliminar" href="{% url 'eliminar_listado' funcionarios.pk %}"
+                   onclick="return confirm('¿Estás seguro de que deseas Eliminar este Listado?');">
+                    <img width="20" height="20" src="{% static 'img/trash-fill.svg' %}">
+                </a>
+                {% endif %}
+
+            </td>
+
+        </tr>
+        {% empty %}
+        <!-- Si no hay resultados -->
+        <tr>
+            <td colspan="8" class="text-center">No se encontraron resultados.</td>
+        </tr>
+
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+</div>
+</div>
+
+
+<style>
+    /* Estilo para la tabla que permitirá el scroll vertical */
+    .table-responsive {
+      max-height: 360px; /* Establece la altura máxima de la tabla */
+      overflow-y: auto;
+    }
+
+    /* Fija los encabezados de la tabla */
+    .table thead th {
+      position: sticky;
+      top: -1px;
+      z-index: 1;
+    }
+
+</style>
+
+
+{% endblock %}

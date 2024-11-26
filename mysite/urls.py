@@ -24,7 +24,7 @@ urlpatterns = [
     path('accounts/profile/', views.menu, name="menu"),
 
     path('', include('autenticacion.urls'), name="autenticacion"),
-    # path('inventario/', include('inventario.urls'), name="inventario"),
+    path('inventario/', include('inventario.urls'), name="inventario"),
 
     ]
 

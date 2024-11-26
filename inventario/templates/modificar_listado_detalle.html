@@ -1,0 +1,33 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+
+
+<h5>Modificar Producto</h5>
+    <form method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon3">Fecha de Registro</span>
+                    <span class="input-group-text btn btn-link border"
+                          id="basic-addon3">{{ form.fecha_registro }}</span>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon3">Producto</span>
+                    <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.producto }}</span>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon3">Cantidad</span>
+                    <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.cantidad }}</span>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon3">Precio</span>
+                    <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.precio }}</span>
+                </div>
+
+        <button type="submit" class="btn btn-success"><i class="fa fa-floppy-o" aria-hidden="true"></i> Modificar</button>
+
+    </form>
+
+
+{% endblock %}

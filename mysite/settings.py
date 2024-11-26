@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 from pathlib import Path
-
-
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,10 +47,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
     'autenticacion',
-    'django_htmx',
-
+    'widget_tweaks',
+    "django_htmx",
+    'core',
+    'inventario',
+    'dal',
+    'dal_select2',
 ]
 
 MIDDLEWARE = [
@@ -89,26 +91,26 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ["PGDATABASE"],
-        'USER': os.environ["PGUSER"],
-        'PASSWORD': os.environ["PGPASSWORD"],
-        'HOST': os.environ["PGHOST"],
-        'PORT': os.environ["PGPORT"],
-    }
-}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': config("PGDATABASE"),
-#         'USER': config("PGUSER"),
-#         'PASSWORD': config("PGPASSWORD"),
-#         'HOST': config("PGHOST", default="localhost"),
-#         'PORT': config("PGPORT", default="5432"),
+#         'NAME': os.environ["PGDATABASE"],
+#         'USER': os.environ["PGUSER"],
+#         'PASSWORD': os.environ["PGPASSWORD"],
+#         'HOST': os.environ["PGHOST"],
+#         'PORT': os.environ["PGPORT"],
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': config("PGDATABASE"),
+        'USER': config("PGUSER"),
+        'PASSWORD': config("PGPASSWORD"),
+        'HOST': config("PGHOST", default="localhost"),
+        'PORT': config("PGPORT", default="5432"),
+    }
+}
 
 # AUTH_USER_MODEL = "autenticacion.Usuario"
 

@@ -1,0 +1,103 @@
+{% load tz %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado del Reporte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h3, h4 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            word-wrap: break-word; /* Permite que el contenido de las celdas se ajuste al ancho */
+            max-width: 100px; /* Ancho máximo para evitar que las celdas se expandan demasiado */
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h3>Resultado del Reporte</h3>
+    <h5>Fecha de Reporte Generado: {{ hoy }}</h5>
+            <h4>Facturas Registradas</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>N° de Factura</th>
+                        <th>Fecha de Facturación</th>
+                        <th>Tipo de Pago</th>
+                        <th>Total Inc. IVA </th>
+                        <th>Estado</th>
+                        <th>Alertas</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in resultado.facturas %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ cliente.cliente.cliente_razonsocial }}</td>
+                            <td>{{ cliente.numero }}</td>
+                            <td>{{ cliente.fecha }}</td>
+                            <td>{{ cliente.tipo_pago }}</td>
+                            <td>$ {{ cliente.total }}</td>
+                            <td>{{ cliente.estado }}</td>
+                            {% if cliente.estado == 'DV' %}
+                                <td> Devuelta </td>
+                            {% elif cliente.estado == 'CE' %}
+                                <td> Ok </td>
+                            {% elif cliente.estado == 'AB' %}
+                                <td> Pendiente </td>
+                            {% endif %}
+                        </tr>
+
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        <div>
+                    <table>
+    <tr>
+        <th>Total Credito:</th>
+        {% if resultado.total_credito == None %}
+             <td>$ 0</td>
+        {% else %}
+            <td>$ {{ resultado.total_credito }}</td>
+        {% endif %}
+
+    </tr>
+    <tr>
+        <th>Total Efectivo:</th>
+        {% if resultado.total_efectivo == None %}
+             <td>$ 0</td>
+        {% else %}
+            <td>$ {{ resultado.total_efectivo }}</td>
+        {% endif %}
+    </tr>
+    <tr>
+        <th>Total Facturado:</th>
+        {% if resultado.total == None %}
+             <td>$ 0</td>
+        {% else %}
+            <td>$ {{ resultado.total }}</td>
+        {% endif %}
+    </tr>
+</table>
+        </div>
+</body>
+</html>

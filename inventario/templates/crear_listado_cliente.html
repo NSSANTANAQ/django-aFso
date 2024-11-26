@@ -1,0 +1,22 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="linea-con-texto"><h5>AÑADIR CLIENTE</h5></div>
+<table class="table">
+    <form method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Fecha de Inicio</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.fecha_inicio }}</span>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Razón Social</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.cliente }}</span>
+        </div>
+        <button type="submit" class="btn btn-success"><i class="fa fa-floppy-o" aria-hidden="true"></i> Registrar</button>
+    </form>
+</table>
+
+
+
+{% endblock %}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Tus metas, títulos y enlaces de estilo aquí -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+</head>
+<body>
+    <!-- Tu contenido aquí -->
+
+    <!-- Mostrar mensajes Toastr -->
+    {% if messages %}
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                {% for message in messages %}
+                    toastr.{{ message.tags }}('{{ message }}');
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+
+    <!-- Otros scripts -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

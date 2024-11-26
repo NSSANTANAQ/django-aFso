@@ -1,0 +1,91 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="container ">
+    <div class="linea-con-texto"><h5>REPORTES</h5></div>
+    <div class="row justify-content-center ">
+        <div class="col-md-8">
+            <form method="post" target="_blank">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon3">Tipo de Reporte:</span>
+                    <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.reporte }}</span>
+                </div>
+
+                <!-- Campos de fecha desde/hasta, inicialmente ocultos -->
+                <div id="fecha-campos" style="display:none;">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">Fecha desde:</span>
+                        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.fecha_desde }}</span>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">Fecha Hasta:</span>
+                        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.fecha_hasta }}</span>
+                    </div>
+                </div>
+
+                <!-- Campos de fecha desde/hasta, inicialmente ocultos -->
+                <div id="fecha-campos-1" style="display:none;">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">Fecha desde:</span>
+                        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.fecha_desde }}</span>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">Fecha Hasta:</span>
+                        <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.fecha_hasta }}</span>
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <button type="submit" class="btn btn-success"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Generar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilo para la tabla que permitirá el scroll vertical */
+.table-responsive {
+  max-height: 400px; /* Establece la altura máxima de la tabla */
+  overflow-y: auto;
+}
+
+/* Fija los encabezados de la tabla */
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reporteField = document.querySelector('select[name="reporte"]');
+        const fechaCampos = document.getElementById('fecha-campos');
+
+        reporteField.addEventListener('change', function() {
+            if (reporteField.value === 'facturas') {
+                fechaCampos.style.display = 'block';
+            }
+            else {
+                fechaCampos.style.display = 'none';
+            }
+        });
+    });
+
+document.addEventListener('DOMContentLoaded', function() {
+        const reporteField = document.querySelector('select[name="reporte"]');
+        const fechaCampos1 = document.getElementById('fecha-campos-1');
+
+        reporteField.addEventListener('change', function() {
+            if (reporteField.value === 'movimientos') {
+                fechaCampos1.style.display = 'block';
+            }
+            else {
+                fechaCampos1.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

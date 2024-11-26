@@ -1,0 +1,61 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+
+
+<div class="linea-con-texto"><h5>AÑADIR CLIENTE</h5></div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Seleccione Cliente:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ factura_form.cliente }}</span>
+        </div>
+
+        <button type="submit" class="btn btn-success"><i class="fa fa-sign-out" aria-hidden="true"></i> Crear Factura</button>
+    </form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" ></script>
+    {% if show_modal %}
+    <script>
+
+$(document).ready(function(){
+    // Verificar si hay una factura abierta
+    var facturaAbierta = "{{ factura_abierta }}";
+    // Esta variable debe ser generada en tu vista Django
+
+
+        if (facturaAbierta) {
+            var id = "{{ factura_abierta.id }}";
+            var numeroFactura = "{{ factura_abierta.numero }}";
+            var clienteFactura = "{{ factura_abierta.cliente.cliente_razonsocial }}";
+            $('#numeroFactura').text(numeroFactura);
+            $('#clienteFactura').text(clienteFactura);
+
+            $('#advertenciaModal').modal('show'); // Mostrar el modal
+        }
+});
+</script>
+    {% endif %}
+<div class="modal fade" id="advertenciaModal" tabindex="-1" aria-labelledby="advertenciaModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="advertenciaModalLabel">¡Advertencia de Factura!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h4>Advertencia</h4>
+        <p><strong>Número de factura:</strong> <span id="numeroFactura"></span></p>
+        <p><strong>Cliente:</strong> <span id="clienteFactura"></span></p>
+        <p>¿Qué deseas hacer?</p>
+      </div>
+      <div class="modal-footer">
+          {% if factura_abierta %}
+    <a href="{% url 'crear_factura_producto' factura_abierta.id %}" class="btn btn-primary">Continuar con la Factura! </a>
+{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

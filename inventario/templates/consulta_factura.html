@@ -1,0 +1,135 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="linea-con-texto"><h5>FACTURAS</h5></div>
+        <table class="table">
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon3">Desde:</span>
+                    <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.fecha_desde}}</span>
+                    <span class="input-group-text" id="basic-addon3">Hasta</span>
+                    <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.fecha_hasta}}</span>
+                    <button type="submit" class="btn btn-success"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+                </div>
+            </form>
+        <a type="submit" class="btn btn-success" href={% url 'crear_factura' %}><i class="fa fa-plus" aria-hidden="true"></i> Facturar</a>
+        </table>
+
+<div class="table-responsive">
+  <table class="table table-striped table-bordered border-secondary">
+            <thead class="table table-dark table-striped table-bordered border-secondary table-hover">
+            <th>N°</th>
+            <th>Factura</th>
+            <th>Fecha</th>
+            <th>RUC</th>
+            <th>Razón Social</th>
+            <th>Tipo de Pago</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+
+            </thead>
+
+            <tbody>
+            {% for factura in resultados %}
+                <tr>
+                    <td> {{ forloop.counter }} </td>
+                    <td> {{ factura.numero }} </td>
+                    <td> {{ factura.fecha }} </td>
+                    <td> {{ factura.cliente.cliente_ruc}}</td>
+                    <td> {{ factura.cliente.cliente_razonsocial}}</td>
+                    <td> {{ factura.tipo_pago}}</td>
+                    <td> $ {{ factura.total }}</td>
+
+                        {% if factura.estado == 'AB'%}
+                            <td style="text-align: center;background-color: darkorange; color: #FFFFFF;"><i class="fa fa-clock-o" aria-hidden="true"> Pendente </i></td>
+
+                        {% endif %}
+                        {% if factura.estado == 'DV'%}
+                            <td style="text-align: center;background-color: #dc3545; color: #FFFFFF;"><i class="fa fa-exchange" aria-hidden="true"> Devuelta </i></td>
+
+                        {% endif %}
+                    {% if factura.estado == 'CE'%}
+                    <td style="text-align: center;background-color: green; color: #FFFFFF;"><i class="fa fa-check" aria-hidden="true"> Factura </i></td>
+                        {% endif %}
+                    <td>
+                         {% if factura.estado == 'AB'%}
+                            <a   style="padding: 5px" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Continuar" href="{% url 'crear_factura_producto' factura.id %}" onclick="return confirm('¿Estás seguro desea seguir facturando?');">
+                            <img width="20" height="20" src="{% static 'img/trabajo-en-progreso.png' %}">
+                            </a>
+                            <a style="padding: 5px" class="btn btn-danger text-dark" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir" href="{% url 'eliminar_factura' factura.id %}" onclick="return confirm('¿Estás seguro de que deseas Devolver esta factura?');">
+                            <img width="20" height="20" src="{% static 'img/trash-fill.svg' %}">
+                            </a>
+                        {% endif %}
+                        {% if factura.estado == 'DV'%}
+                            <a target="_blank"  style="padding: 5px" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir" href="{% url 'pantalla_carga' factura.id %}" onclick="return confirm('¿Estás seguro desea Imprimir la Factura?');">
+                            <img width="20" height="20" src="{% static 'img/printer-fill.svg' %}">
+                            </a>
+
+
+                        {% endif %}
+                    {% if factura.estado == 'CE'%}
+                            <a target="_blank"  style="padding: 5px" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir" href="{% url 'pantalla_carga' factura.id %}" onclick="return confirm('¿Estás seguro desea Imprimir la Factura?');">
+                            <img width="20" height="20" src="{% static 'img/printer-fill.svg' %}">
+                            </a>
+                            <a style="padding: 5px" class="btn btn-danger text-dark" href="{% url 'eliminar_factura' factura.id %}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas Devolver esta factura?');">
+                            <img width="20" height="20" src="{% static 'img/trash-fill.svg' %}">
+                            </a>
+                        {% endif %}
+
+                    </td>
+                </tr>
+                {% empty %}
+                    <!-- Si no hay resultados -->
+                    <tr>
+                        <td colspan="9" class="text-center">No se encontraron resultados.</td>
+                    </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+<style>
+/* Estilo para la tabla que permitirá el scroll vertical */
+.table-responsive {
+  max-height: 360px; /* Establece la altura máxima de la tabla */
+  overflow-y: auto;
+}
+
+/* Fija los encabezados de la tabla */
+.table thead th {
+  position: sticky;
+  top: -1px;
+  z-index: 1;
+
+}
+    .linea-con-texto {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 0px 0;
+        }
+
+        .linea-con-texto::before,
+        .linea-con-texto::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid silver;
+        }
+
+        .linea-con-texto:not(:empty)::before {
+            margin-right: 10px;
+        }
+
+        .linea-con-texto:not(:empty)::after {
+            margin-left: 10px;
+        }
+
+</style>
+
+
+
+{% endblock %}

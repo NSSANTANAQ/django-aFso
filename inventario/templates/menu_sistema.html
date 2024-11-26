@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>SISTEMA INVENTARIO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JavaScript (Bundle incluye Popper.js) -->
+
+    <link href="{% static 'dist/css/select2.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="shortcut icon" type="img/png" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %} ">
+    <link href="{% static 'dist/css/toastr.min.css' %}" rel="stylesheet">
+    {% load django_htmx %}
+<style>
+        body {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 200px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #f8f9fa;
+            padding-top: 20px;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar img {
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 14px;
+            color: #000;
+            border-radius: 1px;
+            margin: 1px 1px;
+        }
+
+        .sidebar a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .sidebar a.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .sidebar a .icon {
+            margin-right: 10px;
+        }
+
+        .sidebar .btn-group.dropend .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #000;
+            border-radius: 4px;
+            margin: 5px 15px;
+            background-color: transparent;
+            border: none;
+        }
+
+        .sidebar .btn-group.dropend .dropdown-toggle:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .sidebar .btn-group.dropend .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            display: none;
+            float: left;
+            min-width: 10rem;
+            padding: .5rem 0;
+            margin: .125rem 0 0;
+            font-size: 1rem;
+            color: #212529;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, .15);
+            border-radius: .25rem;
+        }
+
+        .sidebar .btn-group.dropend .dropdown-menu .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: .25rem 1.5rem;
+            clear: both;
+            font-weight: 400;
+            color: #212529;
+            text-align: inherit;
+            white-space: nowrap;
+            background-color: transparent;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .sidebar .btn-group.dropend .dropdown-menu .dropdown-item:hover,
+        .sidebar .btn-group.dropend .dropdown-menu .dropdown-item:focus {
+            color: #fff;
+            background-color: #007bff;
+        }
+
+        .main-content {
+            margin-left: 200px;
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .details-row {
+            background-color: #f9f9f9;
+        }
+
+        .dropdown-menu {
+            background-color: silver;
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            background-color: #e9ecef;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .sidebar-footer p {
+            margin: 0;
+        }
+
+        .sidebar-footer p strong {
+            font-weight: bold;
+        }
+
+        .sidebar-footer a {
+            display: flow;
+            align-items: center;
+            padding: 5px 5px;
+            text-decoration: none;
+            font-size: 10px;
+            color: #000;
+            border-radius: 4px;
+            margin: 5px 8px;
+        }
+
+        .dropdown-toggle:focus {
+            background-color: silver;
+            text-decoration: none;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div>
+        <img src="{% static '/img/logo_principal.png' %}" width="180" height="80" alt="LOGO">
+        <div class="dropdown dropend">
+            <a class="dropdown-toggle" role="button" id="dropdownMenuLink1" data-bs-toggle="dropdown" aria-expanded="false" tabindex="0">
+                <span class="icon"><i class="fa fa-address-book"></i> Clientes</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
+                <li><a class="dropdown-item" href="{% url 'consulta_cliente' %}"><span class="icon"><i class="fa fa-users"></i> Consulta Clientes</span></a></li>
+                <li><a class="dropdown-item" href="{% url 'crear_cliente' %}"><span class="icon"><i class="fa fa-list-ol"></i> Crear Clientes</span></a></li>
+            </ul>
+        </div>
+        <div class="dropdown dropend">
+            <a class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" tabindex="0">
+                <span class="icon"><i class="fa fa-archive" ></i> Productos</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink2">
+                <li><a class="dropdown-item" href="{% url 'consulta_producto_stock' %}"><span class="icon"><i class="fa fa-search-plus" aria-hidden="true"></i> Producto</span></a></li>
+                <li><a class="dropdown-item" href="{% url 'consulta_producto_movimiento' %}"><span class="icon"><i class="fa fa-stack-overflow" aria-hidden="true"></i> Movimientos</span></a></li>
+            </ul>
+        </div>
+        <div class="dropdown dropend">
+            <a class="dropdown-toggle" role="button"  data-bs-toggle="dropdown" aria-expanded="false" tabindex="0">
+                <span class="icon"><i class="fa fa-clipboard" aria-hidden="true"></i> Facturación</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink2">
+                <li><a class="dropdown-item" href="{% url 'gestionar_listado' %}"><span class="icon"><i class="fa fa-list-alt" aria-hidden="true"></i> Pedidos</span></a></li>
+                <li><a class="dropdown-item" href="{% url 'consulta_factura' %}"><span class="icon"><i class="fa fa-list-ol" aria-hidden="true"></i> Facturas</span></a></li>
+            </ul>
+        </div>
+        <div class="dropdown dropend">
+            <a class="dropdown-toggle" role="button"  data-bs-toggle="dropdown" aria-expanded="false" tabindex="0">
+                <span class="icon"><i class="fa fa-file" aria-hidden="true"></i> Reportes</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink2">
+                <li><a class="dropdown-item" href="{% url 'reportes_generales' %}"><span class="icon"><i class="fa fa-list-ol" aria-hidden="true"></i> Reporte General</span></a></li>
+            </ul>
+        </div>
+        <div class="dropdown dropend">
+            <a class="dropdown-toggle" role="button" id="dropdownMenuLink3" data-bs-toggle="dropdown" aria-expanded="false" tabindex="0">
+                <span class="icon"><i class="fa fa-cog"></i> Configuraciones</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink3">
+                <li><a class="dropdown-item" href="{% url 'configuracion_view' %}"><span class="icon"><i class="fa fa-cogs" aria-hidden="true"></i> General</span></a></li>
+                <li><a class="dropdown-item" href="{% url 'gestionar_perfil' %}"><span class="icon"><i class="fa fa-cogs" aria-hidden="true"></i> Perfil</span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="sidebar-footer">
+        <a class="cerrar_sesion" style="" href="{% url 'logout' %}">
+            <span class="icon"><i class="fas fa-sign-out-alt"></i> Cerrar Sesion</span>
+        </a>
+        <p><strong>Usuario:</strong> {{ request.user.username }}</p>
+        <p>Versión: 1.1.0</p>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="form-control">
+        <div  class="row ">
+            <div class="col ">
+        </div>
+        <div  class="col-6 text-center">
+            <div class="linea-con-texto1"><h5>SISTEMA DE INVENTARIO Y FACTURACIÓN</h5></div>
+        </div>
+        <div class="col ms-auto text-end"> <!-- Utiliza ms-auto para alinear a la derecha y text-end para alinear el texto del botón -->
+            <a href="{% url 'menu_sistemas' %}" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Inicio">
+                <i class="fa fa-home" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+    </div>
+
+    <div class="contenido-principal">
+        {% block content %}
+
+            <div class=" col-auto text-center">
+            <img src="{% static 'img/logo_principal_2.png' %}" class="logo" width="1000" height="500" alt="Logo">
+        </div>
+
+        {% endblock %}
+    </div>
+</div>
+
+
+{% if messages %}
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="{% static 'dist/js/toastr.min.js' %}"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-bottom-right",  // Cambia esta opción para modificar la posición
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+
+                {% for message in messages %}
+                    toastr.{{ message.tags }}('{{ message }}');
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+
+</body>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.8.5"></script>
+{% django_htmx_script %}
+{# or however you include htmx #}
+{% load static %}
+<script src="{% static 'dist/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'dist/js/dialog.js' %}"></script>
+{% load static %}
+<script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    })
+</script>
+<!-- JS de select2 -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'dist/js/select2.full.min.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.select-cliente').select2({
+                ajax: {
+                    url: '{% url "clientes-autocomplete" %}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term, // search term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results,
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                theme: "bootstrap4"
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.select-producto').select2({
+                ajax: {
+                    url: '{% url "productos-autocomplete" %}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term, // search term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results,
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                theme: "bootstrap4"
+            });
+        });
+
+
+
+    // Inicialización del tooltip con opciones personalizadas
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            placement: 'bottom', // Posición del tooltip
+            delay: { show: 500, hide: 100 }, // Retraso de mostrar/ocultar
+            boundary: 'window', // Límite del tooltip
+            // Otros ajustes según necesidad
+        });
+    });
+
+    </script>
+<style>
+.fondo-blanco {
+        background-color: #fff; /* Color blanco */
+        /* Puedes ajustar el color y otros estilos según tus necesidades */
+        padding: 1px; /* Agrega relleno interno si es necesario */
+        border: 1px solid #ccc; /* Agrega un borde si es necesario */
+}
+.contenedor {
+    display: flex; /* Utiliza flexbox para alinear elementos horizontalmente */
+}
+
+.menu-vertical {
+    background-color: #2c3034; /* Color de fondo del menú */
+    width: 150px; /* Ancho del menú */
+}
+
+.separar {
+    height: 515px;
+    list-style: none; /* Elimina los puntos de la lista */
+    padding: 0;
+}
+
+.menu-vertical li {
+    padding: 10px;
+}
+
+.btn {
+    color: #fff; /* Color del texto enlaces */
+    text-decoration: none; /* Elimina la subrayado de los enlaces */
+
+}
+
+.menu-vertical a:hover {
+    background-color: #bcd0c7; /* Cambia el color de fondo al pasar el mouse sobre un enlace */
+}
+
+.logo {
+    opacity: 0.1;
+}
+
+.contenido-principal {
+    flex: 1; /* Hace que el contenido principal ocupe todo el espacio restante */
+    padding: 10px; /* Agrega un espacio alrededor del contenido */
+}
+.linea-con-texto {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 0px 0;
+        }
+
+        .linea-con-texto::before,
+        .linea-con-texto::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid silver;
+        }
+
+        .linea-con-texto:not(:empty)::before {
+            margin-right: 10px;
+        }
+
+        .linea-con-texto:not(:empty)::after {
+            margin-left: 10px;
+        }
+
+</style>
+
+
+</html>
+
+
+
+
+

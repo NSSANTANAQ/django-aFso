@@ -1,0 +1,246 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container"  style="position: relative;padding-bottom: 40px">
+    <div class="row">
+      <!-- Primera columna -->
+      <div class="col-md-6 ">
+        <h2>Facturación</h2>
+        <p>Añadir Productos</p>
+      <form method="post" action="{% url 'crear_factura_producto' factura.id %}">
+            {% csrf_token %}
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Productos:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.producto }}</span>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Ingrese Cantidad:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.cantidad }}</span>
+        </div>
+
+          <button class="btn btn-success" type="submit"><i class="fa fa-arrow-down" aria-hidden="true"></i> Añadir</button>
+          </form>
+          <div class="boton_pedido">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pedidoModal">
+                    <i class="fa fa-cart-arrow-down" aria-hidden="true"> </i> Pedidos
+                </button>
+          </div>
+<br><div class="table-responsive">
+     <table class="table table-striped table-bordered border-secondary" style="font-size: 14px ; text-align: center" >
+            <thead class="table table-dark table-striped table-bordered border-secondary table-hover">
+            <th>Items</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio Uni</th>
+            <th>Precio Total</th>
+            <th>Origen</th>
+            <th>Eliminar</th>
+
+            </thead>
+
+            <tbody>
+
+            {% for producto in lineas %}
+                <tr>
+
+                    <td> {{ forloop.counter }} </td>
+                    <td> {{ producto.producto.producto_nom}}</td>
+                    <td> {{ producto.cantidad }}</td>
+                    <td> {{ producto.precio }}</td>
+                    <td> {{ producto.total }}</td>
+                    <td> {{ producto.estado }}</td>
+                    <td>
+                        <a type="submit" class="btn btn-danger btn-sm text-dark" href="{% url 'eliminar_producto_factura' producto.id %}" onclick="return confirm('¿Estás seguro de que deseas quitar el producto de la lista?');"><span><i  class="fa fa-trash" aria-hidden="true"></i></span></a>
+                    </td>
+                </tr>
+                {% empty %}
+                    <!-- Si no hay resultados -->
+                    <tr>
+                        <td colspan="7" class="text-center">¡Sin Productos Para Facturar!</td>
+                    </tr>
+            {% endfor %}
+
+
+        </table>
+    </div>
+<!-- Modal -->
+
+<div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pedidoModalLabel">Seleccionar Productos</h5>
+<!--            <button type="button" class="btn btn-primary mb-3" id="select-all-btn">Seleccionar Todos</button>-->
+
+                <button type="button" class="btn btn-primary" id="select-all-btn" aria-label="Seleccionar Todos">Seleccionar Todos</button>
+            </div>
+            <div class="modal-body">
+                <form id="procesar-form" method="post" action="{% url 'procesar_seleccionados' %}" style="display: none;">
+                {% csrf_token %}
+                <input type="hidden" name="factura_id" value="{{ factura.id }}">
+                <input type="hidden" name="productos" id="productos-input">
+                </form>
+                <!-- Contenido del modal, como la tabla con los pedidos -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered border-secondary">
+                    <thead class="table table-dark table-striped table-bordered border-secondary table-hover">
+                    <tr>
+                        <th>N°</th>
+                        <th>Fecha de Registro</th>
+                        <th>Producto</th>
+                        <th>Stock</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for fecha, items in grouped_resultados.items %}
+                    <!-- Fila de fecha que abarca todas las columnas -->
+                    <tr>
+                        <td colspan="8" style="tex" class="table-dark-2 text-center text-dark "><strong>{{ fecha }}</strong></td>
+                    </tr>
+                    <!-- Filas de datos correspondientes a esa fecha -->
+                    {% for productos in items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ productos.resultado.fecha_registro }}</td>
+                        <td>{{ productos.resultado.producto }}</td>
+
+                            {% if productos.stock_disponible > productos.resultado.cantidad %}
+                                <td style="text-align: center;background-color: green; color: #FFFFFF;"><i class="fa fa-check" aria-hidden="true"></i> {{ productos.stock_disponible }} </td>
+                            {% else %}
+                                <td style="text-align: center;background-color: red; color: #FFFFFF;"><i class="fa fa-times" aria-hidden="true"></i> {{ productos.stock_disponible }} </td>
+                            {% endif %}
+
+                        <td>{{ productos.resultado.cantidad }}</td>
+                        <td>${{ productos.resultado.precio }}</td>
+                        <td>${{ productos.resultado.total }}</td>
+
+                            {% if productos.resultado.estado != 'PG' and productos.stock_disponible > productos.resultado.cantidad %}
+                                <td style="text-align: center;" >
+                                <input type="checkbox" class="producto-checkbox" id="checkbox-{{ productos.resultado.id }}" value="{{ productos.resultado.id}}">
+                                </td>
+                            {% elif productos.resultado.estado != 'AB' %}
+                                <td style="text-align: center;background-color: green; color: #FFFFFF;"><i class="fa fa-check" aria-hidden="true"></i> Pagado</td>
+                            {% else %}
+                                <td style="text-align: center;background-color: red; color: #FFFFFF;"><i class="fa fa-times" aria-hidden="true"></i></td>
+                            {% endif %}
+
+                    </tr>
+                    {% endfor %}
+                    {% empty %}
+                    <!-- Si no hay resultados -->
+                    <tr>
+                        <td colspan="8" class="text-center">No se encontraron resultados.</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="procesarSeleccionados()">Procesar Seleccionados</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+/* Estilo para la tabla que permitirá el scroll vertical */
+.table-responsive {
+  max-height: 235px; /* Establece la altura máxima de la tabla */
+  overflow-y: auto;
+}
+
+/* Fija los encabezados de la tabla */
+.table thead th {
+  position: sticky;
+  top: -1px;
+  z-index: auto;
+}
+
+</style>
+
+
+      </div>
+      <!-- Segunda columna -->
+      <div class=" col-md-4 gris " style="position: absolute; right: 50px;">
+        <h4>Detalle de la Factura</h4>
+        <p class="fw-bold">Factura: {{ factura.numero }}</p>
+          <p class="fw-bold">RUC: {{ factura.cliente.cliente_ruc }}</p>
+          <p class="fw-bold">Razon Social: {{ factura.cliente.cliente_razonsocial }}</p>
+          <p class="fw-bold">Dirección: {{ factura.cliente.cliente_direccion }}</p>
+          <p class="fw-bold">Contacto: {{ factura.cliente.telefono }}</p>
+          <p class="fw-bold">Correa: {{ factura.cliente.correo}}</p>
+            <form method="post" action="{% url 'actualizar_tipo_pago' factura.id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="tipo_pago" class="form-label">Tipo de Pago</label>
+                    <select class="form-select" id="tipo_pago" name="tipo_pago" onchange="this.form.submit()">
+                        <option value="EFECTIVO" {% if factura.tipo_pago == 'EFECTIVO' %}selected{% endif %}>Efectivo</option>
+                        <option value="CREDITO" {% if factura.tipo_pago == 'CREDITO' %}selected{% endif %}>Crédito</option>
+                    </select>
+                </div>
+            </form>
+      <div class="valores">
+        <h5>Subtotal: $ {{ factura.total }}</h5>
+        <h5>IVA: $ {{ iva }} </h5>
+        <h5>Total: $ {{ total }} </h5>
+
+      </div>
+      <div class="">
+      <a href="{% url 'finalizar_factura' factura.id %}" class="btn btn-success" type="submit"><i class="fa fa-usd" aria-hidden="true"></i> Facturar</a>
+      </div>
+      </div>
+    </div>
+  </div>
+
+<style>
+    /* Estilo personalizado para la columna gris */
+    .gris {
+      background-color: #e9ecef; /* Color gris */
+    }
+    .valores{
+        text-align: right;
+
+    }
+    .boton_pedido{
+        position: fixed;
+        bottom: 500px;
+        right: 600px;
+
+    }
+  </style>
+<script>
+     // Maneja la acción del botón "Seleccionar Todos"
+    document.getElementById('select-all-btn').addEventListener('click', function() {
+        let checkboxes = document.querySelectorAll('.producto-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !checkbox.checked; // Alternar selección
+        });
+    });
+
+    function procesarSeleccionados() {
+    let seleccionados = [];
+    document.querySelectorAll('.producto-checkbox:checked').forEach(checkbox => {
+        seleccionados.push(checkbox.value);
+    });
+
+    if (seleccionados.length > 0) {
+        // Enviar los IDs seleccionados al formulario oculto
+        let productosInput = document.getElementById('productos-input');
+        productosInput.value = seleccionados.join(',');
+
+        console.log('IDs seleccionados:', seleccionados);  // Añadido para depuración
+
+        // Enviar el formulario
+        document.getElementById('procesar-form').submit();
+    } else {
+        alert('No se han seleccionado productos');
+    }
+}
+</script>
+{% endblock %}

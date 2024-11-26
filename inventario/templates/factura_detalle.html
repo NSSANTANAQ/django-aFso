@@ -1,0 +1,24 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de la Factura</title>
+</head>
+<body>
+    <h1>Factura {{ factura.numero }}</h1>
+    <p>Cliente: {{ factura.cliente.nombre }}</p>
+    <p>Fecha: {{ factura.fecha }}</p>
+    <p>Total: {{ factura.total }}</p>
+    <h2>Detalles</h2>
+    <ul>
+        {% for detalle in detalles %}
+            <li>{{ detalle.producto.nombre }} - {{ detalle.cantidad }} x {{ detalle.producto.precio }} = {{ detalle.precio }}</li>
+        {% endfor %}
+    </ul>
+</body>
+
+
+{% endblock %}

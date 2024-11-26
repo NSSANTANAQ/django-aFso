@@ -1,0 +1,30 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="linea-con-texto"><h5>PERFIL</h5></div>
+    <link rel="shortcut icon" type="img/png" href="{% static 'img/favicon.ico' %}">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+            </div>
+            <div class="col form-control">
+                <img src="{% static '/img/logo_principal_3.png' %}" width="200" height=200" class="rounded mx-auto d-block"
+                     alt="...">
+                <h6 style='text-align: center'>Logo - Empresa</h6>
+                <div class="form-control-plaintext">
+                    <span class="input-group-text" id="basic-addon3">Username: {{ user.username }}</span>
+
+                    <span class="input-group-text" id="basic-addon3">Email: {{ user.email }}</span>
+
+
+                </div>
+                <br><a style="align-items: center" class="btn btn-primary" href = "{% url 'cambiar_password' %}"> <i class="fa fa-key" aria-hidden="true"></i> Cambiar Contraseña </a></br>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

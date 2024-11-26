@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+{% load tz %}
+{% load static %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado del Reporte - Productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h3, h4 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            word-wrap: break-word; /* Permite que el contenido de las celdas se ajuste al ancho */
+            max-width: 100px; /* Ancho máximo para evitar que las celdas se expandan demasiado */
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h3>Resultado del Reporte</h3>
+<h5>Fecha del Reporte Generado: {{ hoy }}</h5>
+{% if resultado.productos_nuevos or resultado.productos_anteriores %}
+    {% if resultado.productos_nuevos %}
+        <h4>Productos Nuevos</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Producto</th>
+                <th>Presentacion</th>
+                <th>Fecha de Ingreso</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Alertas</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for cliente in resultado.productos_nuevos %}
+                <tr>
+                    <td> {{ forloop.counter }}</td>
+                    <td>{{ cliente.producto_nom }}</td>
+                    <td>{{ cliente.producto_presentacion_id.presentacion_detalle }}</td>
+                    <td>{{ cliente.producto_fechaingreso }}</td>
+                    <td>{{ cliente.producto_precio }}</td>
+                    <td>{{ cliente.producto_stock }}</td>
+                    {% if cliente.producto_stock == 0 %}
+                        <td> Sin Stock</td>
+                    {% elif cliente.producto_stock >= 2 and cliente.producto_stock <= 5 %}
+                        <td> Precaución</td>
+                    {% elif cliente.producto_stock > 5 %}
+                        <td> Ok</td>
+                    {% endif %}
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if resultado.productos_anteriores %}
+        <h4>Productos Registrados</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Producto</th>
+                <th>Presentacion</th>
+                <th>Fecha de Ingreso</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Alertas</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for cliente in resultado.productos_anteriores %}
+                <tr>
+                    <td> {{ forloop.counter }}</td>
+                    <td>{{ cliente.producto_nom }}</td>
+                    <td>{{ cliente.producto_presentacion.presentacion_detalle }}</td>
+                    <td>{{ cliente.producto_fechaingreso }}</td>
+                    <td>$ {{ cliente.producto_precio }}</td>
+                    <td>{{ cliente.producto_stock }}</td>
+                    {% if cliente.producto_stock == 0 %}
+                        <td> Sin Stock</td>
+                    {% elif cliente.producto_stock >= 2 and cliente.producto_stock <= 5 %}
+                        <td> Precaución</td>
+                    {% elif cliente.producto_stock > 5 %}
+                        <td> Ok</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+{% else %}
+    <p>No hay datos disponibles para el reporte seleccionado.</p>
+{% endif %}
+</body>
+</html>

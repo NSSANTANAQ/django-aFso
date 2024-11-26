@@ -1,0 +1,97 @@
+{% load tz %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado del Reporte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h3, h4 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            word-wrap: break-word; /* Permite que el contenido de las celdas se ajuste al ancho */
+            max-width: 100px; /* Ancho máximo para evitar que las celdas se expandan demasiado */
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h3>Resultado del Reporte</h3>
+    {% if resultado.facturas_nuevas or resultado.facturas_anteriores %}
+        {% if resultado.clientes_nuevos %}
+            <h4>Clientes Nuevos</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>RUC</th>
+                        <th>Razón Social</th>
+                        <th>Dirección</th>
+                        <th>Contacto</th>
+                        <th>Correo</th>
+                        <th>Fecha de Registro</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in resultado.facturas_nuevas %}
+                        <tr>
+                            <td>{{ cliente.cliente_ruc }}</td>
+                            <td>{{ cliente.cliente_razonsocial }}</td>
+                            <td>{{ cliente.cliente_direccion }}</td>
+                            <td>{{ cliente.telefono }}</td>
+                            <td>{{ cliente.correo }}</td>
+                            <td>{{ cliente.fecha_creacion|date:"Y-m-d" }}</td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        {% if resultado.facturas_anteriores %}
+            <h4>Facturas Registradas Devueltas</h4>
+            <table>
+                <thead>
+                    <tr>
+                         <th>RUC</th>
+                        <th>Razón Social</th>
+                        <th>Dirección</th>
+                        <th>Contacto</th>
+                        <th>Correo</th>
+                        <th>Fecha de Registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in resultado.clientes_anteriores %}
+                        <tr>
+                            <td>{{ cliente.cliente_ruc }}</td>
+                            <td>{{ cliente.cliente_razonsocial }}</td>
+                            <td>{{ cliente.cliente_direccion }}</td>
+                            <td>{{ cliente.telefono }}</td>
+                            <td>{{ cliente.correo }}</td>
+                            <td>{{ cliente.fecha_creacion|date:"Y-m-d" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+    {% else %}
+        <p>No hay datos disponibles para el reporte seleccionado.</p>
+    {% endif %}
+</body>
+</html>

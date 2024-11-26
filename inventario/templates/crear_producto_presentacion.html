@@ -1,0 +1,17 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">Ingrese Presentacion:</span>
+            <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.presentacion_detalle }}</span>
+        </div>
+
+    <button type="submit" class="btn btn-success" ><i class="fa fa-floppy-o" aria-hidden="true"></i> Registrar</button>
+</form>
+
+
+{% endblock %}

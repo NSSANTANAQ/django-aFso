@@ -1,0 +1,80 @@
+{% extends "menu_sistema.html" %}
+{% load static %}
+{% block content %}
+<div class="linea-con-texto"><h5>MOVIMIENTOS</h5></div>
+        <table class="table">
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon3">Producto:</span>
+                    <span class="input-group-text btn btn-link border" id="basic-addon3">{{ form.producto }}</span>
+                    <button type="submit" class="btn btn-success"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+                </div>
+            </form>
+        <a type="submit" class="btn btn-success" href={% url 'crear_producto_movimiento' %}><i class="fa fa-plus" aria-hidden="true"></i> Nuevo</a>
+        </table>
+
+<div class="table-responsive">
+
+  <table class="table table-striped table-bordered border-secondary">
+            <thead class="table table-dark table-striped table-bordered table-hover">
+            <th>Movimiento ID</th>
+            <th>Tipo de Movimiento</th>
+            <th>Producto</th>
+            <th>Presentacion</th>
+            <th>Fecha de Ingreso</th>
+            <th>Cantidad</th>
+            <th>Observacion</th>
+            <th>Acciones</th>
+
+            </thead>
+
+            <tbody>
+
+            {% for funcionarios in resultados %}
+                <tr>
+
+                    <td> {{ forloop.counter }}
+                    <td> {{ funcionarios.mov_producto_tipo }} </td>
+                    <td> {{ funcionarios.mov_producto_nom }}</td>
+                    <td> {{ funcionarios.mov_producto_presentacion }}</td>
+                    <td> {{ funcionarios.mov_producto_fechaingreso}}</td>
+                    <td> {{ funcionarios.mov_producto_cantidad }}</td>
+                    <td> {{ funcionarios.mov_producto_observacion }}</td>
+                    <td>
+                        <a href="{% url 'modificar_producto_movimiento' funcionarios.pk %}" type="submit"  class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Modificar" style=" padding: 1px"><img style=" padding: 1px" width="30" height="30" src="{% static 'img/pencil-share.svg' %}"></a>
+                    </td>
+                </tr>
+            {% empty %}
+                    <!-- Si no hay resultados -->
+                    <tr>
+                        <td colspan="8" class="text-center">No se encontraron resultados.</td>
+                    </tr>
+            {% endfor %}
+
+            </tbody>
+
+
+        </table>
+
+    </div>
+
+<style>
+/* Estilo para la tabla que permitirá el scroll vertical */
+.table-responsive {
+  max-height: 400px; /* Establece la altura máxima de la tabla */
+  overflow-y: auto;
+}
+
+/* Fija los encabezados de la tabla */
+.table thead th {
+  position: sticky;
+  top: -1px;
+  z-index: 1;
+}
+
+</style>
+
+
+
+{% endblock %}
