@@ -1,0 +1,12 @@
+{% for message in messages %}
+{% load static %}
+<div class="position-fixed bottom-0 end-0 p-3">
+  <div class="alert {{ message.tags }} alert-dismissible" role="alert" >
+  <div class="alert alert-info" role="alert">
+  {{ message }}
+</div>
+
+  </div>
+</div>
+
+{% endfor %}
