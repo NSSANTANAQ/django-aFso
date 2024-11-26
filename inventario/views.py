@@ -6,9 +6,11 @@ from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-from weasyprint import HTML
 from django.utils import timezone
 from django.db import models
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from io import BytesIO
 from django.conf import settings
 from .forms import (ProductosForm,BusquedaClienteForm,BusquedaProductoForm,GestionarlistadodetalleForm,
                     GestionarlistadoForm, MovproductoModificarForm,ListadoDetalleForm, PresentacionForm,BuscarListadoForm, MovproductoForm,HorasForm,BusquedaProductoMovimientoForm,ClientesForm,ConfiguracionForm,BuscareportForm)
@@ -624,15 +626,20 @@ def imprimir_factura(request, id):
     }
 
     template_path = 'imprimir_factura.html'
+    # Renderiza la plantilla con el contexto
+    template = get_template(template_path)
+    rendered_html = template.render(context)
 
-    # Renderiza la plantilla con los datos del registro
-    # context = {'MEDIA_URL': request.build_absolute_uri(settings.MEDIA_URL),'detalles': detalles,'registro': factura,'fecha_actual':fecha_actual}
-    rendered_html = render(request, template_path, context)
-    # Genera el PDF con WeasyPrint
-    pdf = HTML(string=rendered_html.content, base_url= base_url ).write_pdf()
+    # Crea un buffer en memoria para guardar el PDF
+    response = BytesIO()
+    pdf_status = pisa.CreatePDF(BytesIO(rendered_html.encode("utf-8")), dest=response, encoding='utf-8')
 
-    # Devuelve el PDF como una respuesta HTTP para descargar
-    response = HttpResponse(pdf, content_type='application/pdf')
+    # Verifica si hubo errores al generar el PDF
+    if pdf_status.err:
+        return HttpResponse('Hubo un error al generar el PDF', status=500)
+
+    # Devuelve el PDF como una respuesta HTTP para descargar o mostrar en el navegador
+    response = HttpResponse(response.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename=Factura-{factura.numero}.pdf'
     return response
 def buscar_productos_2(request):
@@ -743,15 +750,30 @@ def reportes_generales(request):
                 'resultado': resultado,
                 'hoy': hoy,
             }
+            template = get_template(template_path)
+            rendered_html = template.render(context)
 
-            rendered_html = render(request, template_path, context)
-            # Genera el PDF con WeasyPrint
-            pdf = HTML(string=rendered_html.content, base_url=base_url).write_pdf()
+            # Crea un buffer en memoria para guardar el PDF
+            response_buffer = BytesIO()
+            pdf_status = pisa.CreatePDF(BytesIO(rendered_html.encode("utf-8")), dest=response_buffer, encoding='utf-8')
 
-            # Devuelve el PDF como una respuesta HTTP para descargar
-            response = HttpResponse(pdf, content_type='application/pdf')
+            # Verifica si hubo errores al generar el PDF
+            if pdf_status.err:
+                return HttpResponse('Hubo un error al generar el PDF', status=500)
+
+            # Devuelve el PDF como una respuesta HTTP para descargar o mostrar en el navegador
+            response = HttpResponse(response_buffer.getvalue(), content_type='application/pdf')
             response['Content-Disposition'] = f'inline; filename=Reporte.pdf'
             return response
+
+            # rendered_html = render(request, template_path, context)
+            # # Genera el PDF con WeasyPrint
+            # pdf = HTML(string=rendered_html.content, base_url=base_url).write_pdf()
+            #
+            # # Devuelve el PDF como una respuesta HTTP para descargar
+            # response = HttpResponse(pdf, content_type='application/pdf')
+            # response['Content-Disposition'] = f'inline; filename=Reporte.pdf'
+            # return response
 
         else:
             print('No se puede')
@@ -1177,12 +1199,26 @@ def gestionar_listado_imprimir_pdf(request,pk):
         'gestion': gestion,
         'hoy': hoy,
     }
+    template = get_template(template_path)
+    rendered_html = template.render(context)
 
-    rendered_html = render(request, template_path, context)
-    # Genera el PDF con WeasyPrint
-    pdf = HTML(string=rendered_html.content, base_url=base_url).write_pdf()
+    # Crea un buffer en memoria para guardar el PDF
+    response_buffer = BytesIO()
+    pdf_status = pisa.CreatePDF(BytesIO(rendered_html.encode("utf-8")), dest=response_buffer, encoding='utf-8')
 
-    # Devuelve el PDF como una respuesta HTTP para descargar
-    response = HttpResponse(pdf, content_type='application/pdf')
+    # Verifica si hubo errores al generar el PDF
+    if pdf_status.err:
+        return HttpResponse('Hubo un error al generar el PDF', status=500)
+
+    # Devuelve el PDF como una respuesta HTTP para descargar o mostrar en el navegador
+    response = HttpResponse(response_buffer.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename=Reporte_listado_estado_{pk}.pdf'
     return response
+    # rendered_html = render(request, template_path, context)
+    # # Genera el PDF con WeasyPrint
+    # pdf = HTML(string=rendered_html.content, base_url=base_url).write_pdf()
+    #
+    # # Devuelve el PDF como una respuesta HTTP para descargar
+    # response = HttpResponse(pdf, content_type='application/pdf')
+    # response['Content-Disposition'] = f'inline; filename=Reporte_listado_estado_{pk}.pdf'
+    # return response
