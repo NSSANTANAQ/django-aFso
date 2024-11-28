@@ -29,11 +29,10 @@ DEBUG = True
 
 AUTH_USER_MODEL = "autenticacion.Usuario"
 
-ALLOWED_HOSTS = ['127.0.0.1',"servicioinventario.up.railway.app"]
+ALLOWED_HOSTS = ["servicioinventario.up.railway.app"]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://127.0.0.1',
-    'https://https://servicioinventario.up.railway.app/',
+    'https://servicioinventario.up.railway.app',
 ]
 # FORM SUBMISSION
 # Comment out the following line and place your railway URL, and your production URL in the array.
