@@ -29,11 +29,11 @@ DEBUG = True
 
 AUTH_USER_MODEL = "autenticacion.Usuario"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['127.0.0.1',"https://servicioinventario.up.railway.app/"]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://127.0.0.1',
-    'https://django-server-production-cf2e.up.railway.app',
+    'https://https://servicioinventario.up.railway.app/',
 ]
 # FORM SUBMISSION
 # Comment out the following line and place your railway URL, and your production URL in the array.

@@ -1,215 +1,143 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Estado de Cuenta</title>
     {% load static %}
-    <link rel="shortcut icon" type="img/png" href="{% static 'img/favicon.ico' %}">
-    <link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %} ">
-<style>
-    .fin{
-        text-align: center;
-    }
-    .date-row {
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}" />
+    <style type="text/css">
+        .fin {
+            text-align: center;
+        }
+        .date-row {
             background-color: #444;
             color: #fff;
             text-align: center;
             font-weight: bold;
         }
-    .mi-tabla {
-    width: 100%; /* Ancho personalizado */
-  }
-    .mi-tabla-2 {
-        font-size: 16px;
-    width: 50%; /* Ancho personalizado */
-  }
-    .mi-tabla-3 {
-    width: 40%; /* Ancho personalizado */
-  }
-
-    .total td:nth-child(1), .total td:nth-child(2){
+        .mi-tabla {
+            font-size: 14px;
+            border-collapse: collapse;
+        }
+        .mi-tabla-2 {
+            font-size: 16px;
+            width: 50%;
+        }
+        .mi-tabla-3 {
+            width: 40%;
+        }
+        .total td:nth-child(1), .total td:nth-child(2) {
             text-align: center;
             background-color: #d1d2d4;
         }
 
-    {#.mi-tabla {#}
-    {#    font-size: 12px;#}
-    {#    width: 75%; /* Ancho personalizado */#}
-    {# }#}
-    img {
-        position: fixed;
-        bottom: 895px;
-        right: 10px;
-        max-width: 200px; /* Ajusta el tamaño de la imagen según sea necesario */
-        height: auto;
-    }
-    body {
-        font-family: "Times New Roman";
-        font-size: 16px;
-    }
-    .tamaño {
-        font-size: 16px;
-    }
+        body {
+            font-family: "Times New Roman", serif;
+            font-size: 16px;
+            margin: 20px;
+        }
+        .tamaño {
+            font-size: 16px;
+        }
+        table, th, td {
 
-</style>
+            border: 1px solid black;
+        }
+        th, td {
 
-
+            padding: 4px;
+            text-align: center;
+        }
+        .table-header {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<img src="{% static 'img/logo_principal_2.png' %}" />
-<div class="container">
-			<div class="row">
-		<div class="col-xs-6">
-			<h1>
-                Estado de Cuenta
-            </h1>
-		</div>
-		<div class="col-xs-6 text-right">
-							<div class="panel panel-default">
-							<div class="tamaño">
-									<h5 class="tamaño">Fecha :
-										<span >{{ hoy }}</span>
-									</h5>
+    <div>
+        <h1>Estado de Cuenta</h1>
+        <div>
+            <h5 class="tamaño">Fecha: <span>{{ hoy }}</span></h5>
+        </div>
 
-							</div>
-<!--							<div class="panel-body">-->
-<!--								<h5 class="tamaño">Factura :-->
-<!--										<span href="#">{{ factura.numero}}</span>-->
-<!--								</h5>-->
-<!--                                <h5 class="tamaño">Fecha de Emision :-->
-<!--										<span href="#">{{ factura.fecha}}</span>-->
-<!--								</h5>-->
-<!--							</div>-->
-						</div>
-					</div>
+        <hr />
 
-			<hr />
+        <h3 class="tamaño" style="text-align: left;">Detalles del Cliente</h3>
+        <div>
+            <span class="tamaño fw-bold">Ruc:</span> {{  gestion.cliente.cliente_ruc }}<br />
+            <span class="tamaño fw-bold">Razon Social/ Nombre y Apellido:</span> {{ gestion.cliente }}<br />
+            <span class="tamaño fw-bold">Dirección:</span> {{  gestion.cliente.cliente_direccion }}<br />
+        </div>
 
-				<h3 class= "fw-bold" style="text-align: left;">Detalles del Cliente</h3>
-
-				<div class="row ">
-					<div class="col-xs-12">
-						<div class="panel panel-default">
-								<div class="panel-heading">
-									<span class="tamaño fw-bold">Ruc:</span> {{  gestion.cliente.cliente_ruc }}
-                                    <div>
-                                    <span class="tamaño fw-bold">Razon Social/ Nombre y Apellido:</span> {{ gestion.cliente }} </div>
-                                    <div>
-                                    <span class="tamaño fw-bold">Dirección:</span> {{  gestion.cliente.cliente_direccion }}</div>
-								</div>
-						</div>
-						</div>
-					</div>
-
-				</div>
-
-<div class="">
-  <table class="table table-sm mi-tabla table-bordered border-secondary mi-tabla">
-            <thead class="table-secondary table-bordered border-secondary text-center">
-            <tr>
-                <th>N°</th>
-                <th>Fecha de Registro</th>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Factura</th>
-            </tr>
-            </thead>
-
-            <tbody class="">
-
-            {% for fecha, items in grouped_resultados.items %}
-                <!-- Fila de fecha que abarca todas las columnas -->
-                <tr class="date-row">
-                    <td colspan="8">{{ fecha }}</td>
-                </tr>
-                <!-- Filas de datos correspondientes a esa fecha -->
-                {% for productos in items %}
+        <table class="mi-tabla">
+            <thead class="table-header">
                 <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ productos.fecha_registro }}</td>
-                    <td>{{ productos.producto }}</td>
-                    <td>{{ productos.cantidad }}</td>
-                    <td>${{ productos.precio }}</td>
-                    <td>${{ productos.total }}</td>
-                    {% if productos.estado == 'AB' %}
-                        <td>Pendiente</td>
-                    {% elif productos.estado == 'PG' %}
-                        <td>Pagado</td>
-                    {% endif %}
-                    {% if productos.estado == 'PG' %}
-                        <td>{{ productos.d_factura.numero }}</td>
-                    {% else %}
-                        <td>Pendiente</td>
-                    {% endif %}
+                    <th>N°</th>
+                    <th>Fecha de Registro</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Venta</th>
                 </tr>
+            </thead>
+            <tbody>
+                {% for fecha, items in grouped_resultados.items %}
+                    <tr class="date-row">
+                        <td colspan="8">{{ fecha }}</td>
+                    </tr>
+                    {% for productos in items %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ productos.fecha_registro|date:"d/m/Y" }}</td>
+                            <td>{{ productos.producto }}</td>
+                            <td>{{ productos.cantidad }}</td>
+                            <td>${{ productos.precio }}</td>
+                            <td>${{ productos.total }}</td>
+                            <td>
+                                {% if productos.estado == 'AB' %}
+                                    Pendiente
+                                {% elif productos.estado == 'PG' %}
+                                    Pagado
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if productos.estado == 'PG' %}
+                                    {{ productos.d_factura.numero }}
+                                {% else %}
+                                    Pendiente
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
                 {% endfor %}
-            {% endfor %}
-        </tbody>
             </tbody>
         </table>
-<!--<table class="mi-tabla-3 table-bordered border-secondary" style="position: fixed; right: 0px;">-->
-<!--                <tr class="total fw-bold">-->
 
-<!--                <td>-->
-<!--                    Subtotal:-->
-<!--                </td>-->
-<!--                <td>-->
-<!--                    ${{ subtotal }}-->
-<!--                </td>-->
-<!--            </tr>-->
-
-<!--{#            #datos de la factura valores#}-->
-<!--            <tr class="total fw-bold ">-->
-
-<!--                <td>-->
-<!--                    IVA (15%):-->
-<!--                </td>-->
-<!--                <td>-->
-<!--                    ${{ iva }}-->
-<!--                </td>-->
-<!--            </tr>-->
-<!--            <tr class="total fw-bold">-->
-<!--                <td>-->
-<!--                    Total:-->
-<!--                </td>-->
-<!--                <td>-->
-<!--                    ${{ total_con_iva }}-->
-<!--                </td>-->
-<!--            </tr>-->
-<!-- </table>-->
-
-
-<table class="table table-sm mi-tabla table-bordered border-secondary mi-tabla-2">
-            <thead class="table-secondary table-bordered border-secondary text-center">
-            <th colspan="2" class="table-active">Información Adicional</th>
-            </thead>
-
-            <tbody class="text-start">
-
+        <table class="mi-tabla mi-tabla-2">
+            <thead>
                 <tr>
-                    <td> Saldo Pendiente :   </td>
+                    <th colspan="2">Información Adicional</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Saldo Pendiente:</td>
                     <td>$ {{ gestion.pendiente }}</td>
                 </tr>
                 <tr>
-                   <td> Pagado : </td>
+                    <td>Pagado:</td>
                     <td>$ {{ gestion.pagado }}</td>
                 </tr>
                 <tr>
-                    <td > Total :  </td>
+                    <td>Total:</td>
                     <td>$ {{ gestion.total }}</td>
                 </tr>
-
-
             </tbody>
-
         </table>
     </div>
-</div>
 </body>
-<!--<div class="fin">-->
-<!--<p style="font-size: 10px;  position: fixed; bottom: 10px; text-align: center">"LA ALTERACIÓN, FALSIFICACIÓN O COMERCIALIZACIÓN ILEGAL DE ESTE DOCUMENTO ESTA PENADO POR LA LEY"</p>-->
-<!--</div>-->
 </html>
+

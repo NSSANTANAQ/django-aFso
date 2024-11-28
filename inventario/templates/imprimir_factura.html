@@ -1,119 +1,177 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
     <title>FACTURA - {{ factura.numero }}</title>
-<!--    {% load static %}-->
+    {% load static %}
     <style>
-        .container {
-            width: 100%;
-            margin: auto;
-            font-family: "Times New Roman", serif;
-            font-size: 12px;
-        }
+    body {
+        font-family: "Times New Roman";
+        font-size: 14px;
+    }
 
-        .header {
-            text-align: center;
-        }
+    img {
+        position: fixed;
+        bottom: 825px;
+        right: 10px;
+        max-width: 300px; /* Ajusta el tamaño de la imagen */
+        height: auto;
+    }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    /* Estilo general para las tablas */
+    .mi-tabla, .mi-tabla-2, .mi-tabla-3 {
+        border: 1px solid black;
+        border-collapse: collapse;
+        margin: 5px 0;
+    }
 
-        .table th, .table td {
-            border: 1px solid black;
-            padding: 5px;
-            text-align: left;
-        }
+    .mi-tabla td, .mi-tabla th,
+    .mi-tabla-2 td, .mi-tabla-2 th,
+    .mi-tabla-3 td, .mi-tabla-3 th {
+        border: 1px solid black;
+        padding: 5px;
+    }
 
-        .total {
-            text-align: right;
-            font-weight: bold;
-        }
+    /* Contenedor para las tablas 2 y 3 */
+    .tabla-contenedor {
+        display: flex;
+        justify-content: space-between;
+    }
 
-        .footer {
-            position: fixed;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            font-size: 10px;
-        }
+    /* Estilo específico para tablas 2 y 3 */
+    .mi-tabla-2, .mi-tabla-3 {
+        width: 48%; /* Ocupan casi la mitad del ancho de la página */
+    }
 
-        .logo {
-            text-align: right;
-            margin-bottom: 20px;
-        }
+    /* Fix para flotantes, no es necesario aquí con flex */
+    .clearfix {
+        clear: both;
+    }
 
-        .logo img {
-            max-width: 150px;
-            height: auto;
-        }
-    </style>
+    .fin {
+        position: fixed;
+        bottom: 10px;
+        right: 15px;
+        text-align: center;
+        width: 100%;
+    }
+</style>
 </head>
 <body>
-<div class="container">
-    <div class="logo">
-<!--        <img src="{% static 'img/logo_principal_2.png' %}" alt="Logo">-->
-    </div>
 
-    <div class="header">
-        <h1>Nota de Venta {% if factura.estado == 'DV' %} - Anulada {% endif %}</h1>
-    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-6">
+                <h1>Nota de Venta
+                    {% if factura.estado == 'DV' %}
+                     - Anulada
+                    {% endif %}
+                </h1>
+            </div>
+            <div class="col-xs-6 text-right">
+                <div class="panel panel-default">
+                    <div class="tamaño">
+                        <h5 class="tamaño">Fecha :
+                            <span>{{ fecha_actual }}</span>
+                        </h5>
+                        <h6 class="tamaño">Autorización : {{ factura_sin }}{{ factura.cliente.cliente_ruc }}</h6>
+                    </div>
+                    <div class="panel-body">
+                        <h5 class="tamaño">Numero :
+                            <span href="#">{{ factura.numero }}</span>
+                        </h5>
+                        <h5 class="tamaño">Fecha de Emision :
+                            <span href="#">{{ factura.fecha }}</span>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <h3 class="fw-bold" style="text-align: left;">Detalles de la Factura:</h3>
+            <div class="row ">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <span class="tamaño fw-bold">Ruc:</span> {{ factura.cliente.cliente_ruc }}
+                            <div><span class="tamaño fw-bold">Razon Social/ Nombre y Apellido:</span> {{ factura.cliente.cliente_razonsocial }}</div>
+                            <div><span class="tamaño fw-bold">Dirección:</span> {{ factura.cliente.cliente_direccion }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <table class="mi-tabla">
+                <thead class="table-secondary text-center">
+                    <tr>
+                        <th>ITEMS</th>
+                        <th>PRODUCTO</th>
+                        <th>CANTIDAD</th>
+                        <th>PRECIO</th>
+                        <th>VALOR TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody class="text-end">
+                {% for funcionarios in detalles %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ funcionarios.producto }}</td>
+                        <td>{{ funcionarios.cantidad }}</td>
+                        <td>${{ funcionarios.precio }}</td>
+                        <td>${{ funcionarios.total }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <div>
-        <h3>Detalles de la Factura:</h3>
-        <p><strong>RUC:</strong> {{ factura.cliente.cliente_ruc }}</p>
-        <p><strong>Razón Social:</strong> {{ factura.cliente.cliente_razonsocial }}</p>
-        <p><strong>Dirección:</strong> {{ factura.cliente.cliente_direccion }}</p>
-    </div>
-
-    <table class="table">
-        <thead>
+        <div>
+             <table style="width: 100%; border-collapse: collapse;">
         <tr>
-            <th>ITEMS</th>
-            <th>PRODUCTO</th>
-            <th>CANTIDAD</th>
-            <th>PRECIO</th>
-            <th>TOTAL</th>
+            <!-- Total General -->
+            <td style="width: 50%; vertical-align: top; border: none;">
+                <h4>Total General:</h4>
+                <table class="mi-tabla-3">
+                    <tr>
+                        <td><strong>TOTAL:</strong></td>
+                        <td><strong>${{ subtotal }}</strong></td>
+                    </tr>
+                </table>
+            </td>
         </tr>
-        </thead>
-        <tbody>
-        {% for item in detalles %}
-        <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ item.producto }}</td>
-            <td>{{ item.cantidad }}</td>
-            <td>${{ item.precio }}</td>
-            <td>${{ item.total }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
     </table>
+</div><br>
+<div>
+    <!-- Contenedor con tabla -->
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <!-- Información Adicional -->
+            <td style="width: 50%; vertical-align: top; border: none;">
+                <h4>Información Adicional:</h4>
+                <table class="mi-tabla-2">
+                    <tr>
+                        <td>Dirección:</td>
+                        <td>{{ factura.cliente.cliente_direccion }}</td>
+                    </tr>
+                    <tr>
+                        <td>Teléfono:</td>
+                        <td>{{ factura.cliente.telefono }}</td>
+                    </tr>
+                    <tr>
+                        <td>Correo:</td>
+                        <td>{{ factura.cliente.correo }}</td>
+                    </tr>
+                </table>
+            </td>
 
-    <div class="total">
-        <p>Total: ${{ subtotal }}</p>
-    </div>
-
-    <h3>Información Adicional</h3>
-    <table class="table">
-        <tr>
-            <td>Dirección</td>
-            <td>{{ factura.cliente.cliente_direccion }}</td>
-        </tr>
-        <tr>
-            <td>Teléfono</td>
-            <td>{{ factura.cliente.telefono }}</td>
-        </tr>
-        <tr>
-            <td>Correo</td>
-            <td>{{ factura.cliente.correo }}</td>
         </tr>
     </table>
 </div>
 
-<div class="footer">
-    <p>"LA ALTERACIÓN, FALSIFICACIÓN O COMERCIALIZACIÓN ILEGAL DE ESTE DOCUMENTO ESTÁ PENADO POR LA LEY"</p>
-</div>
+
+    </div>
 </body>
+<div class="fin">
+    <p style="font-size: 10px;">"LA ALTERACIÓN, FALSIFICACIÓN O COMERCIALIZACIÓN ILEGAL DE ESTE DOCUMENTO ESTÁ PENADO POR LA LEY"</p>
+</div>
 </html>

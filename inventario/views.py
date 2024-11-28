@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+import os
 from django.db import models
 from django.template.loader import get_template
 from xhtml2pdf import pisa
@@ -613,8 +614,7 @@ def imprimir_factura(request, id):
 
     fecha_actual = date.today()
     base_url = request.build_absolute_uri('/')
-
-
+    logo_url = os.path.join(settings.BASE_DIR, 'staticfiles', 'img', 'logo_principal_2.png')
 
     # Renderiza la plantilla con los datos del registro
     context = {
@@ -626,6 +626,7 @@ def imprimir_factura(request, id):
         'iva': iva,
         'total_con_iva': total_con_iva,
         'fecha_actual': fecha_actual,
+        'logo_url': logo_url,
     }
 
     template_path = 'imprimir_factura.html'
