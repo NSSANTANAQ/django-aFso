@@ -1,195 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <title>FACTURA - {{ factura.numero }}</title>
-    {% load static %}
-    <link rel="shortcut icon" type="img/png" href="{% static 'img/favicon.ico' %}">
-    <link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %} ">
-<style>
-    .fin{
-        position: fixed;
-        bottom: 10px;
-        right: 15px;
-        text-align: center;
-        width: 100%;
-    }
-    .mi-tabla {
-    width: 100%; /* Ancho personalizado */
-  }
-    .mi-tabla-2 {
-        font-size: 12px;
-    width: 50%; /* Ancho personalizado */
-  }
-    .mi-tabla-3 {
-    width: 40%; /* Ancho personalizado */
-  }
-
-    .total td:nth-child(1), .total td:nth-child(2){
-            text-align: end;
-            background-color: #d1d2d4;
+<!--    {% load static %}-->
+    <style>
+        .container {
+            width: 100%;
+            margin: auto;
+            font-family: "Times New Roman", serif;
+            font-size: 12px;
         }
 
-    {#.mi-tabla {#}
-    {#    font-size: 12px;#}
-    {#    width: 75%; /* Ancho personalizado */#}
-    {# }#}
-    img {
-        position: fixed;
-        bottom: 825px;
-        right: 10px;
-        max-width: 300px; /* Ajusta el tamaño de la imagen según sea necesario */
-        height: auto;
-    }
-    body {
-        font-family: "Times New Roman";
-        font-size: 16px;
-    }
-    .tamaño {
-        font-size: 16px;
-    }
+        .header {
+            text-align: center;
+        }
 
-</style>
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
+        .table th, .table td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: left;
+        }
 
+        .total {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .logo {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-<img src="{% static 'img/logo_principal_2.png' %}" />
 <div class="container">
-			<div class="row">
-		<div class="col-xs-6">
-			<h1>Nota de Venta
-                {% if factura.estado == 'DV' %}
-                 - Anulada
-                {% endif %}
+    <div class="logo">
+<!--        <img src="{% static 'img/logo_principal_2.png' %}" alt="Logo">-->
+    </div>
 
-            </h1>
-		</div>
-		<div class="col-xs-6 text-right">
-							<div class="panel panel-default">
-							<div class="tamaño">
-									<h5 class="tamaño">Fecha :
-										<span >{{ fecha_actual }}</span>
-									</h5>
-									<h6 class="tamaño">Autorización : {{ factura_sin }}{{ factura.cliente.cliente_ruc }}
-                                    </h6>
-							</div>
-							<div class="panel-body">
-								<h5 class="tamaño">Numero :
-										<span href="#">{{ factura.numero}}</span>
-								</h5>
-                                <h5 class="tamaño">Fecha de Emision :
-										<span href="#">{{ factura.fecha}}</span>
-								</h5>
-							</div>
-						</div>
-					</div>
+    <div class="header">
+        <h1>Nota de Venta {% if factura.estado == 'DV' %} - Anulada {% endif %}</h1>
+    </div>
 
-			<hr />
+    <div>
+        <h3>Detalles de la Factura:</h3>
+        <p><strong>RUC:</strong> {{ factura.cliente.cliente_ruc }}</p>
+        <p><strong>Razón Social:</strong> {{ factura.cliente.cliente_razonsocial }}</p>
+        <p><strong>Dirección:</strong> {{ factura.cliente.cliente_direccion }}</p>
+    </div>
 
-				<h3 class= "fw-bold" style="text-align: left;">Detalles de la Factura:</h3>
-
-				<div class="row ">
-					<div class="col-xs-12">
-						<div class="panel panel-default">
-								<div class="panel-heading">
-									<span class="tamaño fw-bold">Ruc:</span> {{ factura.cliente.cliente_ruc }}
-                                    <div>
-                                    <span class="tamaño fw-bold">Razon Social/ Nombre y Apellido:</span> {{ factura.cliente.cliente_razonsocial }} </div>
-                                    <div>
-                                    <span class="tamaño fw-bold">Dirección:</span> {{ factura.cliente.cliente_direccion }}</div>
-								</div>
-						</div>
-						</div>
-					</div>
-
-				</div>
-
-<div class="">
-  <table class="table table-sm mi-tabla table-bordered border-secondary mi-tabla">
-            <thead class="table-secondary table-bordered border-secondary text-center">
+    <table class="table">
+        <thead>
+        <tr>
             <th>ITEMS</th>
             <th>PRODUCTO</th>
             <th>CANTIDAD</th>
             <th>PRECIO</th>
             <th>TOTAL</th>
-            </thead>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in detalles %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.producto }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>${{ item.precio }}</td>
+            <td>${{ item.total }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
-            <tbody class="text-end">
-            {% for funcionarios in detalles %}
-                <tr>
-                    <td> {{ forloop.counter }} </td>
-                    <td> {{ funcionarios.producto}}</td>
-                    <td> {{ funcionarios.cantidad}}</td>
-                    <td> ${{ funcionarios.precio }}</td>
-                    <td> ${{ funcionarios.total }}</td>
-                </tr>
-
-            {% endfor %}
-            </tbody>
-        </table>
-<table class="mi-tabla-3 table-bordered border-secondary" style="position: fixed; right: 0px;">
-                <tr class="total fw-bold">
-
-                <td>
-                    Total:
-                </td>
-                <td>
-                    ${{ subtotal }}
-                </td>
-            </tr>
-
-<!--{#            #datos de la factura valores#}-->
-<!--            <tr class="total fw-bold ">-->
-
-<!--                <td>-->
-<!--                    IVA (15%):-->
-<!--                </td>-->
-<!--                <td>-->
-<!--                    ${{ iva }}-->
-<!--                </td>-->
-<!--            </tr>-->
-<!--            <tr class="total fw-bold">-->
-<!--                <td>-->
-<!--                    Total:-->
-<!--                </td>-->
-<!--                <td>-->
-<!--                    ${{ total_con_iva }}-->
-<!--                </td>-->
-<!--            </tr>-->
- </table>
-
-
-<table class="table table-sm mi-tabla table-bordered border-secondary mi-tabla-2">
-            <thead class="table-secondary table-bordered border-secondary text-center">
-            <th colspan="2" class="table-active">Información Adicional</th>
-            </thead>
-
-            <tbody class="text-start">
-
-                <tr>
-                    <td> Dirección :   </td>
-                    <td>{{ factura.cliente.cliente_direccion }}</td>
-                </tr>
-                <tr>
-                   <td> Telefono : </td>
-                    <td>{{ factura.cliente.telefono }}</td>
-                </tr>
-                <tr>
-                    <td> Correo :  </td>
-                    <td>{{ factura.cliente.correo }}</td>
-                </tr>
-
-
-
-
-            </tbody>
-
-        </table>
+    <div class="total">
+        <p>Total: ${{ subtotal }}</p>
     </div>
+
+    <h3>Información Adicional</h3>
+    <table class="table">
+        <tr>
+            <td>Dirección</td>
+            <td>{{ factura.cliente.cliente_direccion }}</td>
+        </tr>
+        <tr>
+            <td>Teléfono</td>
+            <td>{{ factura.cliente.telefono }}</td>
+        </tr>
+        <tr>
+            <td>Correo</td>
+            <td>{{ factura.cliente.correo }}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="footer">
+    <p>"LA ALTERACIÓN, FALSIFICACIÓN O COMERCIALIZACIÓN ILEGAL DE ESTE DOCUMENTO ESTÁ PENADO POR LA LEY"</p>
 </div>
 </body>
-<div class="fin">
-<p style="font-size: 10px; ">"LA ALTERACIÓN, FALSIFICACIÓN O COMERCIALIZACIÓN ILEGAL DE ESTE DOCUMENTO ESTA PENADO POR LA LEY"</p>
-</div>
 </html>

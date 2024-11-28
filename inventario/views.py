@@ -613,6 +613,9 @@ def imprimir_factura(request, id):
 
     fecha_actual = date.today()
     base_url = request.build_absolute_uri('/')
+
+
+
     # Renderiza la plantilla con los datos del registro
     context = {
         'MEDIA_URL': request.build_absolute_uri('/'),
@@ -622,7 +625,7 @@ def imprimir_factura(request, id):
         'subtotal': subtotal,
         'iva': iva,
         'total_con_iva': total_con_iva,
-        'fecha_actual': fecha_actual
+        'fecha_actual': fecha_actual,
     }
 
     template_path = 'imprimir_factura.html'
@@ -642,6 +645,7 @@ def imprimir_factura(request, id):
     response = HttpResponse(response.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename=Factura-{factura.numero}.pdf'
     return response
+
 def buscar_productos_2(request):
     if request.is_ajax():
         term = request.GET.get('term', '')

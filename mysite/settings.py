@@ -32,6 +32,7 @@ AUTH_USER_MODEL = "autenticacion.Usuario"
 ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
+    'https://127.0.0.1',
     'https://django-server-production-cf2e.up.railway.app',
 ]
 # FORM SUBMISSION
