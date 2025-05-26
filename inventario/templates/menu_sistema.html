@@ -17,160 +17,125 @@
     <link href="{% static 'dist/css/toastr.min.css' %}" rel="stylesheet">
     {% load django_htmx %}
 <style>
-        body {
-            display: flex;
-            height: 100vh;
-        }
+    body {
+        display: flex;
+        height: 100vh;
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+    }
 
-        .sidebar {
-            height: 100%;
-            width: 200px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: #f8f9fa;
-            padding-top: 20px;
-            border-right: 1px solid #dee2e6;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+    .sidebar {
+        width: 240px;
+        background-color: #343a40;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: fixed;
+        height: 100%;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
 
-        .sidebar img {
-            display: block;
-            margin: 0 auto 20px;
-        }
+    .sidebar img {
+        display: block;
+        margin: 20px auto;
+        max-width: 80%;
+        height: auto;
+    }
 
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            text-decoration: none;
-            font-size: 14px;
-            color: #000;
-            border-radius: 1px;
-            margin: 1px 1px;
-        }
+    .sidebar a,
+    .dropdown-toggle {
+        color: #ccc;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        font-size: 15px;
+    }
 
-        .sidebar a:hover {
-            background-color: #007bff;
-            color: #fff;
-        }
+    .sidebar a:hover,
+    .dropdown-toggle:hover {
+        background-color: #495057;
+        color: #fff;
+    }
 
-        .sidebar a.active {
-            background-color: #007bff;
-            color: white;
-        }
+    .sidebar a.active {
+        background-color: #007bff;
+        color: white;
+    }
 
-        .sidebar a .icon {
-            margin-right: 10px;
-        }
+    .sidebar .icon {
+        margin-right: 10px;
+    }
 
-        .sidebar .btn-group.dropend .dropdown-toggle {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            text-decoration: none;
-            font-size: 18px;
-            color: #000;
-            border-radius: 4px;
-            margin: 5px 15px;
-            background-color: transparent;
-            border: none;
-        }
+    .dropdown-menu {
+        background-color: #f8f9fa;
+        border: none;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 0.5rem 0;
+    }
 
-        .sidebar .btn-group.dropend .dropdown-toggle:hover {
-            background-color: #007bff;
-            color: #fff;
-        }
+    .dropdown-item {
+        color: #212529;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
 
-        .sidebar .btn-group.dropend .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            z-index: 1000;
-            display: none;
-            float: left;
-            min-width: 10rem;
-            padding: .5rem 0;
-            margin: .125rem 0 0;
-            font-size: 1rem;
-            color: #212529;
-            text-align: left;
-            list-style: none;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid rgba(0, 0, 0, .15);
-            border-radius: .25rem;
-        }
+    .dropdown-item:hover {
+        background-color: #007bff;
+        color: white;
+    }
 
-        .sidebar .btn-group.dropend .dropdown-menu .dropdown-item {
-            display: block;
-            width: 100%;
-            padding: .25rem 1.5rem;
-            clear: both;
-            font-weight: 400;
-            color: #212529;
-            text-align: inherit;
-            white-space: nowrap;
-            background-color: transparent;
-            border: 0;
-            cursor: pointer;
-        }
+    .main-content {
+        margin-left: 240px;
+        padding: 30px;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
 
-        .sidebar .btn-group.dropend .dropdown-menu .dropdown-item:hover,
-        .sidebar .btn-group.dropend .dropdown-menu .dropdown-item:focus {
-            color: #fff;
-            background-color: #007bff;
-        }
+    .sidebar-footer {
+        padding: 15px;
+        text-align: center;
+        font-size: 13px;
+        background-color: #212529;
+        color: #adb5bd;
+        border-top: 1px solid #495057;
+    }
 
-        .main-content {
-            margin-left: 200px;
-            padding: 20px;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
+    .sidebar-footer p {
+        margin: 0;
+    }
 
-        .details-row {
-            background-color: #f9f9f9;
-        }
+    .sidebar-footer a {
+        color: #adb5bd;
+        font-size: 13px;
+        text-decoration: none;
+    }
 
-        .dropdown-menu {
-            background-color: silver;
-        }
+    .sidebar-footer a:hover {
+        color: white;
+    }
 
-        .sidebar-footer {
-            padding: 15px;
-            text-align: center;
-            font-size: 14px;
-            background-color: #e9ecef;
-            border-top: 1px solid #dee2e6;
-        }
+    .linea-con-texto1 h5 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        padding: 10px 0;
+        border-bottom: 2px solid #007bff;
+    }
 
-        .sidebar-footer p {
-            margin: 0;
-        }
+    .btn-secondary {
+        border-radius: 6px;
+        font-size: 14px;
+        padding: 6px 16px;
+    }
 
-        .sidebar-footer p strong {
-            font-weight: bold;
-        }
+</style>
 
-        .sidebar-footer a {
-            display: flow;
-            align-items: center;
-            padding: 5px 5px;
-            text-decoration: none;
-            font-size: 10px;
-            color: #000;
-            border-radius: 4px;
-            margin: 5px 8px;
-        }
-
-        .dropdown-toggle:focus {
-            background-color: silver;
-            text-decoration: none;
-        }
-    </style>
 
 
 </head>
