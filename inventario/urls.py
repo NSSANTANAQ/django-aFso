@@ -52,5 +52,6 @@ urlpatterns = [
     path('procesar_seleccionados/', views.procesar_seleccionados, name='procesar_seleccionados'),
 
 
-    path('obtener_precio_producto_presentacion/', views.obtener_precio_producto_presentacion, name='obtener_precio_producto_presentacion')
+    path('obtener_precio_producto_presentacion/', views.obtener_precio_producto_presentacion, name='obtener_precio_producto_presentacion'),
+
 ]

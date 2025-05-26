@@ -106,10 +106,10 @@ def crear_producto_stock(request):
             crearform = ProductosForm()
 
     else:
-        preform = PresentacionForm()
+        presentacionform = PresentacionForm()
         crearform= ProductosForm()
         resultados_pre = Presentacion.objects.all()
-    return render(request, 'crear_producto_stock.html',{'form':crearform,'resultados_pre':resultados_pre,'preform':preform})
+    return render(request, 'crear_producto_stock.html',{'form':crearform,'resultados_pre':resultados_pre,'preform':presentacionform})
 @login_required(login_url='login1')
 def crear_presentacion(request):
     if request.method == "POST":
@@ -708,8 +708,8 @@ def crear_cliente(request):
 
 class ProductosAutocomplete(autocomplete.Select2QuerySetView):
     def get(self, request, *args, **kwargs):
-        term = request.GET.get('q', '')
-        productos = Productos.objects.filter(producto_nom__icontains=term)
+        term1 = request.GET.get('q', '')
+        productos = Productos.objects.filter(producto_nom__icontains=term1)
         results = [{'id': producto.producto_id, 'text': producto.producto_nom} for producto in productos]
         return JsonResponse({'results': results})
 
@@ -1227,3 +1227,4 @@ def gestionar_listado_imprimir_pdf(request,pk):
     # response = HttpResponse(pdf, content_type='application/pdf')
     # response['Content-Disposition'] = f'inline; filename=Reporte_listado_estado_{pk}.pdf'
     # return response
+
