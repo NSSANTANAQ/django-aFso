@@ -29,7 +29,7 @@ DEBUG = True
 
 AUTH_USER_MODEL = "autenticacion.Usuario"
 
-# ALLOWED_HOSTS = ["servicioinventario.up.railway.app"]
+ALLOWED_HOSTS = ["servicioinventario.up.railway.app"]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://servicioinventario.up.railway.app',
