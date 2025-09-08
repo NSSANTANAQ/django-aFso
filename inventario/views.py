@@ -10,7 +10,14 @@ from django.utils import timezone
 import os
 from django.db import models
 from django.template.loader import get_template
-from xhtml2pdf import pisa
+from reportlab.platypus import (
+    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageBreak
+)
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+from reportlab.lib import colors
+from collections import OrderedDict
+from django.contrib.staticfiles import finders
 from io import BytesIO
 from django.conf import settings
 from .forms import (ProductosForm,BusquedaClienteForm,BusquedaProductoForm,GestionarlistadodetalleForm,
@@ -22,7 +29,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import inlineformset_factory
 from .models import Factura, FacturaDetalle
 from .forms import FacturaForm, FacturaDetalleForm
-from dal import autocomplete
+
 import json
 from django_select2.views import AutoResponseView
 from django.http import JsonResponse
@@ -647,23 +654,6 @@ def imprimir_factura(request, id):
     response['Content-Disposition'] = f'inline; filename=Factura-{factura.numero}.pdf'
     return response
 
-def buscar_productos_2(request):
-    if request.is_ajax():
-        term = request.GET.get('term', '')
-        productos = Productos.objects.filter(nombre__icontains=term)
-        results = []
-        for producto in productos:
-            producto_json = {}
-            producto_json['id'] = producto.id
-            producto_json['label'] = producto.nombre
-            producto_json['value'] = producto.nombre
-            producto_json['precio'] = str(producto.precio)
-            results.append(producto_json)
-        data = json.dumps(results)
-        return JsonResponse(data, safe=False)
-    else:
-        return JsonResponse({'error': 'Not an AJAX request'}, status=400)
-
 
 @login_required(login_url='login1')
 def consulta_cliente(request):
@@ -706,21 +696,6 @@ def crear_cliente(request):
     return render(request, 'crear_cliente.html',{'form':crearform})
 
 
-class ProductosAutocomplete(autocomplete.Select2QuerySetView):
-    def get(self, request, *args, **kwargs):
-        term1 = request.GET.get('q', '')
-        productos = Productos.objects.filter(producto_nom__icontains=term1)
-        results = [{'id': producto.producto_id, 'text': producto.producto_nom} for producto in productos]
-        return JsonResponse({'results': results})
-
-
-class ClientesAutocomplete(AutoResponseView):
-
-    def get(self, request, *args, **kwargs):
-        term = request.GET.get('q', '')
-        clientes = Clientes.objects.filter(cliente_razonsocial__icontains=term)
-        results = [{'id': cliente.cliente_id, 'text': cliente.cliente_razonsocial} for cliente in clientes]
-        return JsonResponse({'results': results})
 
 @login_required(login_url='login1')
 def configuracion_view(request):
@@ -1180,12 +1155,37 @@ def procesar_seleccionados(request):
     else:
         return JsonResponse({'success': False, 'message': 'Método no permitido'})
 @login_required(login_url='login1')
-def gestionar_listado_imprimir_pdf(request,pk):
-    gestion = get_object_or_404(Gestionar_listado, pk=pk)
-    print(gestion)
-    resultados = Gestionar_listado_detalle.objects.filter(gestion=pk).order_by('fecha_registro')
+# 🔹 Encabezado y pie de página personalizados
+def add_header_footer(canvas, doc):
+    width, height = A4
 
-    # Agrupar resultados por fecha
+    # Encabezado con logo y título
+    canvas.saveState()
+    logo_path = "media/logo_principal.png"  # 👈 Ajusta a la ruta real de tu logo
+    try:
+        canvas.drawImage(logo_path, 40, height - 60, width=60, height=40, preserveAspectRatio=True)
+    except:
+        pass  # Si no hay logo, se ignora
+
+    canvas.setFont("Helvetica-Bold", 12)
+    canvas.drawCentredString(width / 2.0, height - 40, "Reporte de Listado")
+
+    # Pie de página
+    canvas.setFont("Helvetica", 8)
+    hoy = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
+    canvas.drawRightString(width - 40, 30, f"Generado: {hoy}")
+    canvas.drawString(40, 30, f"Página {doc.page}")
+
+    canvas.restoreState()
+
+
+def gestionar_listado_imprimir_pdf(request, pk):
+    gestion = get_object_or_404(Gestionar_listado, pk=pk)
+    resultados = Gestionar_listado_detalle.objects.filter(
+        gestion=pk
+    ).order_by("fecha_registro")
+
+    # 🔹 Agrupar resultados por fecha
     grouped_resultados = OrderedDict()
     for resultado in resultados:
         fecha = resultado.fecha_registro
@@ -1193,38 +1193,59 @@ def gestionar_listado_imprimir_pdf(request,pk):
             grouped_resultados[fecha] = []
         grouped_resultados[fecha].append(resultado)
 
-    template_path = 'gestionar_listado_imprimir_pdf.html'
+    # 🔹 Buffer en memoria
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4,
+                            leftMargin=40, rightMargin=40,
+                            topMargin=80, bottomMargin=50)
 
+    # Estilos de texto
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name="CenteredTitle", alignment=TA_CENTER, fontSize=14, leading=16, spaceAfter=20))
+    styles.add(ParagraphStyle(name="RightText", alignment=TA_RIGHT, fontSize=10))
+
+    story = []
+
+    # 🔹 Encabezado inicial
+    story.append(Paragraph(f"Reporte de listado - Gestión #{pk}", styles["CenteredTitle"]))
     hoy = timezone.localtime(timezone.now()).date()
-    base_url = request.build_absolute_uri('/')
-    # Renderiza la plantilla con los datos del registro
-    context = {
-        'MEDIA_URL': request.build_absolute_uri('/'),
-        'grouped_resultados': dict(grouped_resultados),
-        'gestion': gestion,
-        'hoy': hoy,
-    }
-    template = get_template(template_path)
-    rendered_html = template.render(context)
+    story.append(Paragraph(f"Fecha de generación: {hoy}", styles["Normal"]))
+    story.append(Spacer(1, 20))
 
-    # Crea un buffer en memoria para guardar el PDF
-    response_buffer = BytesIO()
-    pdf_status = pisa.CreatePDF(BytesIO(rendered_html.encode("utf-8")), dest=response_buffer, encoding='utf-8')
+    # 🔹 Recorrer grupos por fecha
+    for fecha, items in grouped_resultados.items():
+        story.append(Paragraph(f"<b>Fecha: {fecha}</b>", styles["Heading2"]))
+        story.append(Spacer(1, 12))
 
-    # Verifica si hubo errores al generar el PDF
-    if pdf_status.err:
-        return HttpResponse('Hubo un error al generar el PDF', status=500)
+        # Cabecera de tabla (ajusta a tus campos reales)
+        data = [["Campo1", "Campo2", "Campo3"]]
+        for item in items:
+            data.append([
+                str(item.campo1),  # 👈 Ajusta estos nombres
+                str(item.campo2),
+                str(item.campo3),
+            ])
 
-    # Devuelve el PDF como una respuesta HTTP para descargar o mostrar en el navegador
-    response = HttpResponse(response_buffer.getvalue(), content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename=Reporte_listado_estado_{pk}.pdf'
+        table = Table(data, repeatRows=1, colWidths=[150, 150, 150])
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#003366")),  # Azul corporativo
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
+            ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+
+        story.append(table)
+        story.append(Spacer(1, 20))
+
+    # 🔹 Construir PDF con encabezado y pie
+    doc.build(story, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename=Reporte_listado_estado_{pk}.pdf'
     return response
-    # rendered_html = render(request, template_path, context)
-    # # Genera el PDF con WeasyPrint
-    # pdf = HTML(string=rendered_html.content, base_url=base_url).write_pdf()
-    #
-    # # Devuelve el PDF como una respuesta HTTP para descargar
-    # response = HttpResponse(pdf, content_type='application/pdf')
-    # response['Content-Disposition'] = f'inline; filename=Reporte_listado_estado_{pk}.pdf'
-    # return response
+
 

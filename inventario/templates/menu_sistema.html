@@ -1,343 +1,238 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>SISTEMA INVENTARIO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
-    {% load static %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="{% static 'dist/css/select2.min.css' %}" rel="stylesheet">
-    <link href="{% static 'dist/js/select2.full.min.js' %}" rel="stylesheet">
-    <link href="{% static 'dist/css/toastr.min.css' %}" rel="stylesheet">
-    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
-    <link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %}">
-    {% load django_htmx %}
-    {% load widget_tweaks %}
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f4f6f9;
-        }
+  <meta charset="UTF-8">
+  <title>Sistema Contable Moderno</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% load static %}
+  <!-- En el <head> -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
+  <style>
+    :root {
+      --sidebar-compact-width: 60px;
+      --sidebar-bg: #2c3e50;
+      --sidebar-hover-bg: #3e536b;
+      --text-color: #ecf0f1;
+      --active-link-color: #3498db;
+      --main-bg-color: #f4f6f8;
+      --card-bg-color: #ffffff;
+    }
 
-        .sidebar {
-            width: 240px;
-            background-color: #1e1e2f;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--main-bg-color);
+      display: flex;
+    }
 
-        .sidebar img {
-            margin: 20px auto;
-            display: block;
-            width: 180px;
-        }
+    .sidebar {
+      width: var(--sidebar-compact-width);
+      background-color: var(--sidebar-bg);
+      height: 100vh;
+      padding-top: 1rem;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1050;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-        .sidebar .nav-link,
-        .sidebar .dropdown-toggle {
-            color: #c2c7d0;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            font-size: 15px;
-            border-radius: 6px;
-        }
+    .sidebar .logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
 
-        .sidebar .nav-link:hover,
-        .sidebar .dropdown-toggle:hover {
-            background-color: #3c8dbc;
-            color: #fff;
-        }
+    .sidebar .logo img {
+      width: 40px;
+    }
 
-        .sidebar .nav-link i,
-        .sidebar .dropdown-toggle i {
-            margin-right: 10px;
-        }
+    .sidebar .nav-item {
+      position: relative; /* Importante para el posicionamiento de la etiqueta */
+      margin-bottom: 0.5rem;
+    }
 
-        .sidebar .dropdown-menu {
-            background-color: #2c3b4e;
-            border: none;
-        }
+    .sidebar .nav-link {
+      width: var(--sidebar-compact-width);
+      height: var(--sidebar-compact-width);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-color);
+      text-decoration: none;
+      transition: background 0.2s;
+      font-size: 1.2rem;
+      border-radius: 8px;
+    }
 
-        .sidebar .dropdown-item {
-            color: #dcdcdc;
-            font-size: 14px;
-        }
+    .sidebar .nav-link:hover {
+      background-color: var(--sidebar-hover-bg);
+    }
 
-        .sidebar .dropdown-item:hover {
-            background-color: #3c8dbc;
-            color: #fff;
-        }
+    .sidebar .nav-link.active {
+      background-color: var(--sidebar-hover-bg);
+      color: var(--active-link-color) !important;
+      border-left: 4px solid var(--active-link-color);
+    }
 
-        .sidebar-footer {
-            padding: 15px;
-            font-size: 13px;
-            background-color: #1a252f;
-            text-align: center;
-            border-top: 1px solid #33475b;
-        }
+    .main-content {
+      margin-left: var(--sidebar-compact-width);
+      padding: 2rem;
+      flex-grow: 1;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease-in-out;
+    }
 
-        .sidebar-footer a {
-            color: #ff4d4d;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 10px;
-            text-decoration: none;
-        }
+    .main-content .card-container {
+      background-color: var(--card-bg-color);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
 
-        .main-content {
-            flex-grow: 1;
-            padding: 30px;
-        }
+    .content-section {
+        display: none;
+    }
 
-        .header-title {
-            text-align: center;
-            font-size: 22px;
-            margin-bottom: 30px;
-            font-weight: bold;
-            color: #34495e;
-            text-shadow: 1px 1px 2px #ccc;
-        }
-      /* Sidebar general */
+    .content-section.active {
+        display: block;
+    }
 
+    .nav-item .nav-label {
+        visibility: hidden;
+        width: auto;
+        white-space: nowrap;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 10px;
+        position: absolute;
+        z-index: 1;
+        left: calc(var(--sidebar-compact-width) + 10px);
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
 
-/* Accordion */
-.accordion-button {
-  background-color: transparent;
-  border: none;
-  color: #eee;
-  font-weight: 600;
-  font-size: 1.05rem;
-  padding: 12px 20px;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: background-color 0.3s ease;
-  border-radius: 0 20px 20px 0;
-}
-
-.accordion-button:hover,
-.accordion-button:focus {
-  background-color: #4b4b7d;
-  outline: none;
-  color: #fff;
-}
-
-/* Icon rotate on expand */
-.accordion-button.collapsed::after {
-  font-weight: 900;
-  margin-left: auto;
-  transition: transform 0.3s ease;
-  transform: rotate(0deg);
-  color: white;
-  filter: brightness(0) invert(1);
-}
-
-.accordion-button:not(.collapsed)::after {
-  transform: rotate(180deg);
-}
-
-/* Accordion body */
-.accordion-body {
-  padding-left: 40px;
-  background-color: #2a2a48;
-  font-size: 0.95rem;
-  border-left: 3px solid #6464b8;
-}
-
-/* List inside accordion */
-.accordion-body ul {
-  padding-left: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.accordion-body ul li {
-  margin-bottom: 10px;
-}
-
-.accordion-body ul li a {
-  color: #ccc;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: color 0.3s ease;
-}
-
-.accordion-body ul li a:hover {
-  color: #fff;
-  font-weight: 600;
-}
-
-/* Sidebar footer */
-.sidebar-footer {
-  margin-top: auto;
-  background-color: #121225;
-
-  font-size: 0.9rem;
-  border-top: 1px solid #444466;
-  text-align: center;
-  color: #bbb;
-}
-
-.sidebar-footer p {
-  margin: 5px 0;
-}
-
-.sidebar-footer a {
-  text-color: blue;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-
-/* Icons */
-
-
-/* Optional: smooth transition for accordion collapse */
-.accordion-collapse.collapse {
-  transition: height 0.35s ease;
-}
-      .logout-link i {
-  color: red;
-}
-
-.logout-link:hover i {
-  color: white;
-}
-    </style>
+    .nav-item:hover .nav-label {
+        visibility: visible;
+        opacity: 1;
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="sidebar">
-  <img src="{% static 'img/logo_principal.png' %}" alt="LOGO">
-  <div class="accordion" id="sidebarAccordion">
-
-    <!-- Clientes -->
-    <div class="">
-      <h2 class="accordion-header" id="headingClientes">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseClientes" aria-expanded="false" aria-controls="collapseClientes">
-          <i class="fa fa-address-book me-2"></i> Clientes
-        </button>
-      </h2>
-      <div id="collapseClientes" class="accordion-collapse collapse" aria-labelledby="headingClientes" data-bs-parent="#sidebarAccordion">
-        <div class="accordion-body">
-          <ul class="list-unstyled ms-3">
-            <li><a href="{% url 'consulta_cliente' %}"><i class="fa fa-users me-2"></i>Consulta</a></li>
-            <li><a href="{% url 'crear_cliente' %}"><i class="fa fa-plus me-2"></i>Crear</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Productos -->
-    <div class="">
-      <h2 class="accordion-header" id="headingProductos">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductos" aria-expanded="false" aria-controls="collapseProductos">
-          <i class="fa fa-archive me-2"></i> Productos
-        </button>
-      </h2>
-      <div id="collapseProductos" class="accordion-collapse collapse" aria-labelledby="headingProductos" data-bs-parent="#sidebarAccordion">
-        <div class="accordion-body">
-          <ul class="list-unstyled ms-3">
-            <li><a href="{% url 'consulta_producto_stock' %}"><i class="fa fa-boxes me-2"></i>Stock</a></li>
-            <li><a href="{% url 'consulta_producto_movimiento' %}"><i class="fa fa-exchange-alt me-2"></i>Movimientos</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Facturación -->
-    <div class="">
-      <h2 class="accordion-header" id="headingFacturacion">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFacturacion" aria-expanded="false" aria-controls="collapseFacturacion">
-          <i class="fa fa-clipboard me-2"></i> Facturación
-        </button>
-      </h2>
-      <div id="collapseFacturacion" class="accordion-collapse collapse" aria-labelledby="headingFacturacion" data-bs-parent="#sidebarAccordion">
-        <div class="accordion-body">
-          <ul class="list-unstyled ms-3">
-            <li><a href="{% url 'gestionar_listado' %}"><i class="fa fa-file-alt me-2"></i>Pedidos</a></li>
-            <li><a href="{% url 'consulta_factura' %}"><i class="fa fa-list-alt me-2"></i>Facturas</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Reportes -->
-    <div class="">
-      <h2 class="accordion-header" id="headingReportes">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReportes" aria-expanded="false" aria-controls="collapseReportes">
-          <i class="fa fa-chart-bar me-2"></i> Reportes
-        </button>
-      </h2>
-      <div id="collapseReportes" class="accordion-collapse collapse" aria-labelledby="headingReportes" data-bs-parent="#sidebarAccordion">
-        <div class="accordion-body">
-          <ul class="list-unstyled ms-3">
-            <li><a href="{% url 'reportes_generales' %}"><i class="fa fa-chart-pie me-2"></i>General</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Configuraciones -->
-    <div class="">
-      <h2 class="accordion-header" id="headingConfig">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConfig" aria-expanded="false" aria-controls="collapseConfig">
-          <i class="fa fa-cog me-2"></i> Configuraciones
-        </button>
-      </h2>
-      <div id="collapseConfig" class="accordion-collapse collapse" aria-labelledby="headingConfig" data-bs-parent="#sidebarAccordion">
-        <div class="accordion-body">
-          <ul class="list-unstyled ms-3">
-            <li><a href="{% url 'configuracion_view' %}"><i class="fa fa-tools me-2"></i>General</a></li>
-            <li><a href="{% url 'gestionar_perfil' %}"><i class="fa fa-user-cog me-2"></i>Perfil</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
+<div class="sidebar" id="sidebar">
+  <div class="logo">
+    <img src="{% static 'img/logo_principal_white.png' %}" alt="Logo">
   </div>
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link active" href="#clientes">
+        <i class="fa fa-user-group"></i>
+        <span class="nav-label">Clientes</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#productos">
+        <i class="fa fa-box"></i>
+        <span class="nav-label">Productos</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#facturacion">
+        <i class="fa fa-file-invoice"></i>
+        <span class="nav-label">Facturación</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#reportes">
+        <i class="fa fa-chart-line"></i>
+        <span class="nav-label">Reportes</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#configuracion">
+        <i class="fa fa-gear"></i>
+        <span class="nav-label">Configuración</span>
+      </a>
+    </li>
+    <li class="nav-item mt-auto">
+      <a class="nav-link" href="{% url 'logout' %}">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="nav-label">Salir</span>
+      </a>
+    </li>
+  </ul>
+</div>
 
-  <!-- Footer -->
-  <div class="sidebar-footer">
-        <p><strong>Usuario:</strong> {{ request.user.username }}</p>
-        <p>Versión: 1.1.0</p>
-        <a type="button" class="logout-link btn-outline-danger btn-sm" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+<div class="main-content" id="main-content">
+  <div class="card-container">
+    <!-- Contenido dinámico para cada sección -->
+    <div id="clientes-content" class="content-section active">
+      <h2>Clientes</h2>
+      <p>Aquí se mostrará el contenido de la sección de Clientes.</p>
     </div>
+
+    <div id="productos-content" class="content-section">
+      <h2>Productos</h2>
+      <p>Aquí se mostrará el contenido de la sección de Productos.</p>
+    </div>
+
+    <div id="facturacion-content" class="content-section">
+      <h2>Facturación</h2>
+      <p>Aquí se mostrará el contenido de la sección de Facturación.</p>
+    </div>
+
+    <div id="reportes-content" class="content-section">
+      <h2>Reportes</h2>
+      <p>Aquí se mostrará el contenido de la sección de Reportes.</p>
+    </div>
+
+    <div id="configuracion-content" class="content-section">
+      <h2>Configuración</h2>
+      <p>Aquí se mostrará el contenido de la sección de Configuración.</p>
+    </div>
+  </div>
 </div>
 
-<div class="main-content">
-    <div class="header-title">SISTEMA DE INVENTARIO Y FACTURACIÓN</div>
-    {% block content %}
-    <!-- Aquí va el contenido dinámico -->
-    {% endblock %}
-</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('.select2').select2({
+      width: '100%',
+      placeholder: "Seleccione..."
+    });
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
-<link href="{% static 'dist/css/select2.min.css' %}" rel="stylesheet">
-    <link href="{% static 'dist/js/select2.full.min.js' %}" rel="stylesheet">
+    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        navLinks.forEach(item => item.classList.remove('active'));
+        contentSections.forEach(section => section.classList.remove('active'));
+
+        this.classList.add('active');
+        const targetId = this.getAttribute('href').substring(1) + '-content';
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.classList.add('active');
+        }
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
-
-
-
-
-
 

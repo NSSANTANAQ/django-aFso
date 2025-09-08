@@ -29,7 +29,7 @@ DEBUG = True
 
 AUTH_USER_MODEL = "autenticacion.Usuario"
 
-ALLOWED_HOSTS = ["servicioinventario.up.railway.app"]
+# ALLOWED_HOSTS = ["servicioinventario.up.railway.app"]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://servicioinventario.up.railway.app',
@@ -49,11 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'autenticacion',
     'widget_tweaks',
-    "django_htmx",
     'core',
     'inventario',
-    'dal',
-    'dal_select2',
 ]
 
 MIDDLEWARE = [
@@ -91,16 +88,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ["PGDATABASE"],
-#         'USER': os.environ["PGUSER"],
-#         'PASSWORD': os.environ["PGPASSWORD"],
-#         'HOST': os.environ["PGHOST"],
-#         'PORT': os.environ["PGPORT"],
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -135,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-ec'
 
 TIME_ZONE = 'UTC'
 

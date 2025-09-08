@@ -61,7 +61,8 @@ class ProductosForm(forms.ModelForm):
             model = Productos
             fields = ['producto_nom', 'producto_presentacion', 'producto_fechaingreso','producto_stock', 'producto_precio']
             widgets = {
-            'producto_fechaingreso': forms.DateInput(attrs={'type': 'date'}),
+                'producto_fechaingreso': forms.DateInput(attrs={'type': 'date'}),
+                'producto_presentacion': forms.Select(attrs={'class': 'select2'}),
             }
 
 class MovproductoForm(forms.ModelForm):
@@ -71,21 +72,13 @@ class MovproductoForm(forms.ModelForm):
     ]
     mov_producto_tipo = forms.ChoiceField(choices=TIPO_CHOICES, label='tipo de movimiento')
     mov_producto_precio = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
-    mov_producto_nom = forms.ModelChoiceField(
-        queryset=Productos.objects.all(),
-        required=True,
-        widget=Select2Widget(
-            attrs={'class': 'select-producto btn-lg', 'data-placeholder': 'Seleccione',
-                   'data-url': 'productos-autocomplete'}
-        ),
-
-    )
     mov_producto_observacion = forms.CharField(label='Observación', widget=forms.Textarea(attrs={'name': 'body', 'rows': 10, 'cols': 20}))
     class Meta:
         model = Movimientoproductos
         fields = ['mov_producto_nom','mov_producto_presentacion', 'mov_producto_fechaingreso', 'mov_producto_precio' , 'mov_producto_cantidad','mov_producto_observacion']
         widgets = {
             'mov_producto_fechaingreso': forms.DateInput(attrs={'type': 'date'}),
+            'mov_producto_nom': forms.Select(attrs={'class': 'select2'}),
         }
 
 class MovproductoModificarForm(forms.ModelForm):
@@ -104,32 +97,20 @@ class MovproductoModificarForm(forms.ModelForm):
 
 
 class FacturaForm(forms.ModelForm):
-    cliente = forms.ModelChoiceField(
-        queryset=Clientes.objects.all(),
-        required=True,
-        widget=Select2Widget(
-            attrs={'class': 'select-cliente btn btn-lg','data-placeholder': 'Seleccione un Cliente', 'data-url': 'clientes-autocomplete'}
-        ),
-
-    )
     class Meta:
         model = Factura
         fields = ['cliente']
+        widgets = {
+            'cliente': forms.Select(attrs={'class': 'select2'}),
+        }
 
 class FacturaDetalleForm(forms.ModelForm):
-    producto = forms.ModelChoiceField(
-        queryset=Productos.objects.all(),
-        required=True,
-        widget=Select2Widget(
-            attrs={'class': 'select-producto btn btn-lg', 'data-placeholder': 'Seleccione',
-                   'data-url': 'productos-autocomplete'}
-        ),
-
-    )
-
     class Meta:
         model = FacturaDetalle
         fields = ['producto', 'cantidad']
+        widgets = {
+            'producto': forms.Select(attrs={'class': 'select2'}),
+        }
 
 class ConfiguracionForm(forms.ModelForm):
     class Meta:
@@ -155,35 +136,18 @@ class BuscareportForm(forms.Form):
                              widget=forms.Select(attrs={'class': ''}))
 
 class GestionarlistadoForm(forms.ModelForm):
-    cliente = forms.ModelChoiceField(
-        queryset=Clientes.objects.all(),
-        required=True,
-        widget=Select2Widget(
-            attrs={'class': 'select-cliente btn btn-lg', 'data-placeholder': 'Seleccione un Cliente',
-                   'data-url': 'clientes-autocomplete'}
-        ),
-
-    )
     class Meta:
         model = Gestionar_listado
         fields = ['fecha_inicio', 'cliente']
         widgets = {
             'fecha_inicio': forms.DateInput(attrs={'type': 'date'}),
+            'cliente': forms.Select(attrs={'class': 'select2'}),
         }
 
 class BuscarListadoForm(forms.Form):
     cliente = forms.CharField(max_length=200)
 
 class GestionarlistadodetalleForm(forms.ModelForm):
-    producto = forms.ModelChoiceField(
-        queryset=Productos.objects.all(),
-        required=True,
-        widget=Select2Widget(
-            attrs={'class': 'select-producto btn btn-lg', 'data-placeholder': 'Seleccione',
-                   'data-url': 'productos-autocomplete'}
-        ),
-
-    )
 
     # d_factura = models.ForeignKey(Factura, on_delete=models.CASCADE)
     # id_producto = models.ForeignKey(FacturaDetalle, on_delete=models.CASCADE)
@@ -193,6 +157,7 @@ class GestionarlistadodetalleForm(forms.ModelForm):
         fields = ['fecha_registro', 'producto','cantidad','precio']
         widgets = {
             'fecha_registro': forms.DateInput(attrs={'type': 'date'}),
+            'producto': forms.Select(attrs={'class': 'select2'}),
         }
 
 class ListadoDetalleForm(forms.Form):

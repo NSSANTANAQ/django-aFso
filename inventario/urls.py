@@ -1,6 +1,6 @@
 from django.urls import path, include
 from . import views
-from .views import ProductosAutocomplete,ClientesAutocomplete
+
 
 
 urlpatterns = [
@@ -14,7 +14,6 @@ urlpatterns = [
     path('crear_producto_movimiento/', views.crear_producto_movimiento, name="crear_producto_movimiento"),
     path('modificar_producto_movimiento/<int:pk>/', views.modificar_producto_movimiento, name="modificar_producto_movimiento"),
     path('buscar-productos/', views.buscar_productos, name='buscar_productos'),
-    path('buscar-productos_2/', views.buscar_productos_2, name='buscar_productos_2'),
     path('buscar_clientes/', views.buscar_clientes, name='buscar_clientes'),
 
     path('consulta_factura/', views.consulta_factura, name='consulta_factura'),
@@ -32,8 +31,6 @@ urlpatterns = [
     path('eliminar_clientes/<int:pk>/', views.eliminar_clientes, name='eliminar_clientes'),
     path('configuracion/', views.configuracion_view, name='configuracion_view'),
 
-    path('productos-autocomplete/', ProductosAutocomplete.as_view(), name='productos-autocomplete'),
-    path('clientes-autocomplete/', ClientesAutocomplete.as_view(), name='clientes-autocomplete'),
     path('reportes_generales/', views.reportes_generales, name='reportes_generales'),
 
     path('pantalla-carga/<int:id>/', views.pantalla_carga, name='pantalla_carga'),
